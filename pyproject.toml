@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools >= 61.0", "autosemver"]
+requires = ["setuptools >= 70.0", "autosemver"]
 # build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,28 +7,27 @@ requires-python = ">=3.12"
 dependencies = [
     "autosemver"
 ]
-name = "mypackage"
+name = "campbell-control"
 dynamic = ["version"]
-authors = [{ name = "John Doe", email = "johdoe@ceh.ac.uk" }]
-description = "A minimal setup for a template package."
+description = "A python package for controlling Campbell dataloggers over MQTT"
 
 [project.optional-dependencies]
 test = ["pytest", "pytest-cov", "parameterized"]
 docs = ["sphinx", "sphinx-copybutton", "sphinx-rtd-theme"]
 lint = ["ruff"]
-dev = ["mypackage[test,docs,lint]"]
+dev = ["campbell-control[test,docs,lint]"]
 
 [tool.setuptools.dynamic]
-version = { attr = "mypackage.__version__" }
+version = { attr = "campbellcontrol.__version__" }
 
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["mypackage*"]
+include = ["campbellcontrol*"]
 
 [tool.pytest.ini_options]
 
-addopts = "--cov=mypackage"
+addopts = "--cov=campbellcontrol"
 markers = [
     "slow: Marks slow tests",
 ]

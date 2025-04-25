@@ -1,7 +1,7 @@
-mypackage
+campbellcontrol
 =========
 
 .. toctree::
    :maxdepth: 4
 
-   mypackage
+   campbellcontrol

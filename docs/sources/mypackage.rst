@@ -1,13 +1,13 @@
-mypackage package
+campbellcontrol package
 =================
 
 Submodules
 ----------
 
-mypackage.module module
+campbellcontrol.module module
 -----------------------
 
-.. automodule:: mypackage.module
+.. automodule:: campbellcontrol.module
    :members:
    :undoc-members:
    :show-inheritance:
@@ -15,7 +15,7 @@ mypackage.module module
 Module contents
 ---------------
 
-.. automodule:: mypackage
+.. automodule:: campbellcontrol
    :members:
    :undoc-members:
    :show-inheritance:
