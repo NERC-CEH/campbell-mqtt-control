@@ -15,7 +15,10 @@ description = "A python package for controlling Campbell dataloggers over MQTT"
 test = ["pytest", "pytest-cov", "parameterized"]
 docs = ["sphinx", "sphinx-copybutton", "sphinx-rtd-theme"]
 lint = ["ruff"]
-dev = ["campbell-control[test,docs,lint]"]
+paho = ["paho-mqtt"]
+aws = ["awscrt"]
+all = ["campbell-control[paho,aws]"]
+dev = ["campbell-control[test,docs,lint,all]"]
 
 [tool.setuptools.dynamic]
 version = { attr = "campbellcontrol.__version__" }
