@@ -162,48 +162,48 @@ cs/v2/cr/QU8Q-9JTY-HVP8/setting b'{"error":"Invalid setting: EthernetPowder"}'
 # Historic Data
 Success
 ```bash
-INFO:root:cs/v2/cc/QU8Q-9JTY-HVP8/historicData b'{"table": "Table1", "start": "2025-04-01T03:16:51", "end": "2025-05-01T10:16:51"}'
-INFO:root:cs/v2/cr/QU8Q-9JTY-HVP8/historicData/Table1/cj b'{"head": {"transaction": 0,"signature": 52815,"environment":  {"station_name":  "70681","table_name":  "Table1","model":  "CR1000X","serial_no":  "70681","os_version":  "CR1000X.Std.08.01","prog_name":  "CPU:CPU_hacked-milo-script 1.CR1X"},"fields":  [{"name":  "BattV","type":  "xsd:float","units":  "Volts","process":  "Smp","settable":  false},{"name":  "PTemp_C","type":  "xsd:float","units":  "Deg C","process":  "Smp","settable":  false}]},"data": []}'
+cs/v2/cc/QU8Q-9JTY-HVP8/historicData b'{"table": "Table1", "start": "2025-04-01T03:16:51", "end": "2025-05-01T10:16:51"}'
+cs/v2/cr/QU8Q-9JTY-HVP8/historicData/Table1/cj b'{"head": {"transaction": 0,"signature": 52815,"environment":  {"station_name":  "70681","table_name":  "Table1","model":  "CR1000X","serial_no":  "70681","os_version":  "CR1000X.Std.08.01","prog_name":  "CPU:CPU_hacked-milo-script 1.CR1X"},"fields":  [{"name":  "BattV","type":  "xsd:float","units":  "Volts","process":  "Smp","settable":  false},{"name":  "PTemp_C","type":  "xsd:float","units":  "Deg C","process":  "Smp","settable":  false}]},"data": []}'
 ```
 Table doesn't exist
 ```bash
-INFO:root:cs/v2/cc/QU8Q-9JTY-HVP8/historicData b'{"table": "publish", "start": "2025-05-01T03:16:51", "end": "2025-05-01T03:16:51"}'
-INFO:root:cs/v2/cr/QU8Q-9JTY-HVP8/historicData b'{"error":"Historic Data: Table does not exist!"}'
+cs/v2/cc/QU8Q-9JTY-HVP8/historicData b'{"table": "publish", "start": "2025-05-01T03:16:51", "end": "2025-05-01T03:16:51"}'
+cs/v2/cr/QU8Q-9JTY-HVP8/historicData b'{"error":"Historic Data: Table does not exist!"}'
 ```
 # Set Variable
 Successful. Sucess doesn't imply that the variable was set. If the type is FLOAT, it can't be set to a STRING
 ```bash
-INFO:root:cs/v2/cc/QU8Q-9JTY-HVP8/setVar b'{"name": "VarOne", "value": "1.2"}'
-INFO:root:cs/v2/cr/QU8Q-9JTY-HVP8/setVar b'{"success":"Set variable succeeded"}'
+cs/v2/cc/QU8Q-9JTY-HVP8/setVar b'{"name": "VarOne", "value": "1.2"}'
+cs/v2/cr/QU8Q-9JTY-HVP8/setVar b'{"success":"Set variable succeeded"}'
 ```
 
 Variable doesn't exist
 ```bash
-INFO:root:cs/v2/cc/QU8Q-9JTY-HVP8/setVar b'{"name": "VarOne", "value": "1.2"}'
-INFO:root:cs/v2/cr/QU8Q-9JTY-HVP8/setVar b'{"error":"Set variable failed"}'
+cs/v2/cc/QU8Q-9JTY-HVP8/setVar b'{"name": "VarOne", "value": "1.2"}'
+cs/v2/cr/QU8Q-9JTY-HVP8/setVar b'{"error":"Set variable failed"}'
 ```
 
 # Get Variable
 Success
 ```bash
-INFO:root:cs/v2/cc/QU8Q-9JTY-HVP8/setVar b'{"name": "VarOne", "value": "1.2"}'
-INFO:root:cs/v2/cr/QU8Q-9JTY-HVP8/setVar b'{"success":"Set variable succeeded"}'
+cs/v2/cc/QU8Q-9JTY-HVP8/setVar b'{"name": "VarOne", "value": "1.2"}'
+cs/v2/cr/QU8Q-9JTY-HVP8/setVar b'{"success":"Set variable succeeded"}'
 ```
 Variable doesn't exist
 ```bash
-INFO:root:cs/v2/cc/QU8Q-9JTY-HVP8/getVar b'{"name": "VarTwo"}'
-INFO:root:cs/v2/cr/QU8Q-9JTY-HVP8/getVar b'{"error":"Invalid field: VarTwo"}'
+cs/v2/cc/QU8Q-9JTY-HVP8/getVar b'{"name": "VarTwo"}'
+cs/v2/cr/QU8Q-9JTY-HVP8/getVar b'{"error":"Invalid field: VarTwo"}'
 ```
 
 # Talk Thru
 Illegal port
 ```bash
-INFO:root:cs/v2/cc/QU8Q-9JTY-HVP8/talkThru b'{"comPort": "ComU6", "outString": "heyyo"}'
-INFO:root:cs/v2/cr/QU8Q-9JTY-HVP8/talkThru b'{"response":"Illegal ComPort"}'
+cs/v2/cc/QU8Q-9JTY-HVP8/talkThru b'{"comPort": "ComU6", "outString": "heyyo"}'
+cs/v2/cr/QU8Q-9JTY-HVP8/talkThru b'{"response":"Illegal ComPort"}'
 ```
 
 Closed port
 ```bash
-INFO:root:cs/v2/cc/QU8Q-9JTY-HVP8/talkThru b'{"comPort": "ComC1", "outString": "heyyo"}'
-INFO:root:cs/v2/cr/QU8Q-9JTY-HVP8/talkThru b'{"response":"ComPort must be open to use MQTT Talk Thru"}'
+cs/v2/cc/QU8Q-9JTY-HVP8/talkThru b'{"comPort": "ComC1", "outString": "heyyo"}'
+cs/v2/cr/QU8Q-9JTY-HVP8/talkThru b'{"response":"ComPort must be open to use MQTT Talk Thru"}'
 ```
