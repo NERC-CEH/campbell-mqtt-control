@@ -11,10 +11,13 @@ class FileDownloadPayload(TypedDict):
 
 class URLPayload(TypedDict):
     """Payload for specifying a URL."""
+
     url: str
+
 
 class ActionPayload(TypedDict):
     """Payload for specifying an action."""
+
     action: str
 
 
@@ -89,7 +92,7 @@ class MQTTConfig(Command):
 
 class EditConstants(Command):
     """Command to edit constants in a CRBasic program.
-        Values are converted to correct types by the logger.
+    Values are converted to correct types by the logger.
     """
 
     command_name = "editConst"
@@ -106,6 +109,7 @@ class EditConstants(Command):
         output.update(kwargs)
         return output
 
+
 class Reboot(Command):
     """Command to reboot the logger."""
 
@@ -115,6 +119,7 @@ class Reboot(Command):
     def payload() -> ActionPayload:
         """Return the payload for the Reboot command."""
         return {"action": "reboot"}
+
 
 # class Controller:
 #     """Controller class to manage connections and operations."""
