@@ -45,11 +45,12 @@ omit = ["*__init__.py"]
 
 [tool.ruff]
 src = ["src", "tests"]
-include = ["src/**.py"]
+include = ["src/**.py", "tests/**.py"]
 line-length = 120
 
 [tool.ruff.lint]
 select = ["F", "E", "W", "A", "PLC", "PLE", "PLW", "I", "N816", "ANN001", "ANN201", "ANN202", "ANN205", "ANN206"]
+exclude = ["tests/**.py"]
 
 [tool.ruff.lint.flake8-type-checking]
 strict = true

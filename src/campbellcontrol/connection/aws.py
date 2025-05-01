@@ -1,4 +1,6 @@
 import logging
+import time
+from typing import Callable
 
 import awscrt.mqtt
 from awscrt.exceptions import AwsCrtError
@@ -10,9 +12,9 @@ from awscrt.mqtt import (
     OnConnectionSuccessData,
     QoS,
 )
-import time
+
 from campbellcontrol.connection.interface import Connection
-from typing import Callable
+
 logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger(__name__)
@@ -49,22 +51,18 @@ class AWSConnection(Connection):
         future = self.client.disconnect()
         future.result()
 
-    def subscribe(self, topic: str, qos: QoS=QoS.EXACTLY_ONCE, callback:Callable|None=None) -> None:
-        future, _ = self.client.subscribe(
-            topic=topic,
-            qos=qos,
-            callback=callback
-        )
-        
+    def subscribe(self, topic: str, qos: QoS = QoS.EXACTLY_ONCE, callback: Callable | None = None) -> None:
+        future, _ = self.client.subscribe(topic=topic, qos=qos, callback=callback)
+
         result = future.result()
         exception = future.exception()
-        
+
         if exception:
             logger.error("Subscription failed. error: {}".format(exception))
             return
         logger.info("Subscription successful. result: {}".format(result))
-    
-    def publish(self, topic: str, payload: str|bytes|bytearray, qos: QoS, retain: bool=False) -> None:
+
+    def publish(self, topic: str, payload: str | bytes | bytearray, qos: QoS, retain: bool = False) -> None:
         future, _ = self.client.publish(topic=topic, payload=payload, qos=qos, retain=retain)
         future.result()
 
@@ -75,7 +73,7 @@ class AWSConnection(Connection):
         self, connection: awscrt.mqtt.Connection, return_code: ConnectReturnCode, session_present: bool, **kwargs
     ) -> None:
         logger.info("Connection resumed. return_code: {} session_present: {}".format(return_code, session_present))
-        
+
     def _on_connection_success(
         self, connection: awscrt.mqtt.Connection, callback_data: OnConnectionSuccessData
     ) -> None:
