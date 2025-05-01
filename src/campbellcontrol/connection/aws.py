@@ -74,8 +74,8 @@ class AWSConnection(Connection):
     def _on_connection_resumed(
         self, connection: awscrt.mqtt.Connection, return_code: ConnectReturnCode, session_present: bool, **kwargs
     ) -> None:
-        logger.error("Connection resumed. return_code: {} session_present: {}".format(return_code, session_present))
-
+        logger.info("Connection resumed. return_code: {} session_present: {}".format(return_code, session_present))
+        
     def _on_connection_success(
         self, connection: awscrt.mqtt.Connection, callback_data: OnConnectionSuccessData
     ) -> None:
