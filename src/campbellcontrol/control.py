@@ -60,6 +60,39 @@ class SettingsApplyPayload(TypedDict):
     apply: bool
 
 
+class GetVarPayload(TypedDict):
+    """Payload for a getting a variable"""
+
+    name: str
+
+
+class SetVarPayload(TypedDict):
+    """Payload for setting a variable"""
+
+    name: str
+    value: str
+
+
+class HistoricDataPayload(TypedDict):
+    """Payload for getting historic data"""
+
+    table: str
+    start: str
+    end: str
+
+
+class TalkThruPayload(TypedDict):
+    """Payload for talking to a sensor"""
+
+    comPort: str
+
+    outString: str
+    numberTries: Optional[str]
+
+    respDelay: Optional[str]
+    abort: Optional[bool]
+
+
 class Error(TypedDict):
     """Error response"""
 
@@ -191,7 +224,9 @@ class File(Command):
 
         if action in ["delete", "run"]:
             if not filename:
-                raise RuntimeError(f"`filename` is a requirement argument for the `{action}` action")
+                raise RuntimeError(
+                    f"`filename` is a requirement argument for the `{action}` action"
+                )
             return cls._file_action(action, filename, drive)
         if action == "list":
             return cls._list_files(drive)
@@ -199,7 +234,9 @@ class File(Command):
             return cls._stop_program()
 
     @staticmethod
-    def _file_action(action: str, filename: str, drive: Optional[str] = None) -> FileActionPayload:
+    def _file_action(
+        action: str, filename: str, drive: Optional[str] = None
+    ) -> FileActionPayload:
         output = {
             "action": action,
             "fileName": filename,
@@ -248,7 +285,9 @@ class Settings(Command):
             return cls._publish(name)
 
         if not value:
-            raise RuntimeError(f"`value` argument is required for the `{action}` action")
+            raise RuntimeError(
+                f"`value` argument is required for the `{action}` action"
+            )
 
         if action == "set":
             return cls._set(name, value, apply)
@@ -273,13 +312,58 @@ class Settings(Command):
         return {"action": "apply", "apply": True}
 
 
-# class Controller:
-#     """Controller class to manage connections and operations."""
+class SetVar(Command):
+    """Set variables present in the logger script"""
 
-#     def __init__(self, connection: Connection) -> None:
-#         self.broker = connection
-#         self.broker.connect()
+    command_name = "SetVar"
 
-#     def send_command(self, *args, **kwargs) -> None:
-#         """Send a command to the broker."""
-#         self.broker.publish(*args, **kwargs)
+    def payload(name: str, value: str) -> SetVarPayload:
+        """Payload for setting a variable"""
+        return {"name": name, "value": value}
+
+
+class GetVar(Command):
+    """Get variables present in the logger script"""
+
+    command_name = "GetVar"
+
+    def payload(name: str) -> GetVarPayload:
+        """Payload for getting a variable"""
+        return {"name": name}
+
+
+class HistoricData(Command):
+    """Retrieve historic data"""
+
+    command_name = "historicData"
+
+    def payload(table: str, start: str, end: str) -> HistoricDataPayload:
+        """Payload for retrieving historic data"""
+
+        return {"table": table, "start": start, "end": end}
+
+
+class TalkThru(Command):
+    """Talk through to sensor"""
+
+    command_name = "talkThru"
+
+    def payload(
+        com_port: str,
+        out_string: str,
+        num_tries: Optional[str] = None,
+        resp_delay: Optional[str] = None,
+        abort: Optional[bool] = None,
+    ) -> TalkThruPayload:
+        output = {"comPort": com_port, "outString": out_string}
+
+        if num_tries:
+            output.update({"numberTries": num_tries})
+
+        if resp_delay:
+            output.update({"respDelay": resp_delay})
+
+        if abort:
+            output.update({"abort": abort})
+
+        return output
