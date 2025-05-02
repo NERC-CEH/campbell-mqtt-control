@@ -135,8 +135,8 @@ cs/v2/cr/QU8Q-9JTY-HVP8/fileControl b'{"error":"File does not exist"}'
 
 Setting (without apply)
 ```bash
-INFO:root:cs/v2/cc/QU8Q-9JTY-HVP8/setting b'{"action": "set", "name": "PakBusAddress", "value": "1"}'
-INFO:root:cs/v2/cr/QU8Q-9JTY-HVP8/setting b'{"success":"Settings set successfully"}'
+cs/v2/cc/QU8Q-9JTY-HVP8/setting b'{"action": "set", "name": "PakBusAddress", "value": "1"}'
+cs/v2/cr/QU8Q-9JTY-HVP8/setting b'{"success":"Settings set successfully"}'
 ```
 
 Setting (with apply=true)
