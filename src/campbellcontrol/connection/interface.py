@@ -13,7 +13,6 @@ class Connection(ABC):
     @abstractmethod
     def get_client(self, *args, **kwargs) -> Any:
         """Return the client instance."""
-        pass
 
     def connect(self) -> None:
         """Connect to the MQTT broker."""
@@ -25,7 +24,7 @@ class Connection(ABC):
 
     def publish(self, topic: str, payload: str, *args, **kwargs) -> None:
         """Publish a message to a topic."""
-        self.client.publish(topic, payload)
+        self.client.publish(topic, payload, *args, **kwargs)
 
     def subscribe(self, topic: str) -> None:
         """Subscribe to a topic."""
