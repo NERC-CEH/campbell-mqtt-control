@@ -10,7 +10,6 @@ class TestPahoClient(TestCase):
     """Test the Paho MQTT client"""
 
     def test_instantiation(self):
-
         client = PahoConnection("endpoint", 1883)
 
         self.assertIsInstance(client.client, paho.mqtt.client.Client)
@@ -23,7 +22,6 @@ class TestPahoClient(TestCase):
 
     @patch("logging.info")
     def test_on_message(self, mock):
-
         PahoConnection._on_message("client", "userdata", MagicMock())
         self.assertTrue(mock.called)
 
@@ -35,7 +33,6 @@ class TestPahoClient(TestCase):
     @patch("logging.info")
     @patch("logging.error")
     def test_on_disconnect(self, mock_error, mock_info):
-
         # non-zero reason code should log an error
         PahoConnection._on_disconnect("client", "userdata", "flags", 1, "properties")
         self.assertTrue(mock_error.called)
@@ -71,6 +68,4 @@ class TestPahoClient(TestCase):
             conn.client.unsubscribe.assert_called_once_with("sub_topic")
 
             conn.publish("sub_topic", "payload", extra_arg=1)
-            conn.client.publish.assert_called_once_with(
-                "sub_topic", "payload", extra_arg=1
-            )
+            conn.client.publish.assert_called_once_with("sub_topic", "payload", extra_arg=1)

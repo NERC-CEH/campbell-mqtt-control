@@ -29,15 +29,9 @@ class TestMQTTCommands(unittest.TestCase):
         url = "http://example.com/firmware.bin"
         expected_payload = {"url": url}
 
-        self.assertEqual(
-            OS.publish_topic(self.group_id, self.serial), expected_publish_topic
-        )
-        self.assertEqual(
-            OS.response_topic(self.group_id, self.serial), expected_response_topic
-        )
-        self.assertEqual(
-            OS.state_topic(self.group_id, self.serial), expected_state_topic
-        )
+        self.assertEqual(OS.publish_topic(self.group_id, self.serial), expected_publish_topic)
+        self.assertEqual(OS.response_topic(self.group_id, self.serial), expected_response_topic)
+        self.assertEqual(OS.state_topic(self.group_id, self.serial), expected_state_topic)
         self.assertEqual(OS.payload(url), expected_payload)
 
     def test_program_command(self):
@@ -50,15 +44,9 @@ class TestMQTTCommands(unittest.TestCase):
         filename = "testScript.crb"
         expected_payload = {"url": url, "fileName": filename}
 
-        self.assertEqual(
-            Program.publish_topic(self.group_id, self.serial), expected_publish_topic
-        )
-        self.assertEqual(
-            Program.response_topic(self.group_id, self.serial), expected_response_topic
-        )
-        self.assertEqual(
-            Program.state_topic(self.group_id, self.serial), expected_state_topic
-        )
+        self.assertEqual(Program.publish_topic(self.group_id, self.serial), expected_publish_topic)
+        self.assertEqual(Program.response_topic(self.group_id, self.serial), expected_response_topic)
+        self.assertEqual(Program.state_topic(self.group_id, self.serial), expected_state_topic)
         self.assertEqual(Program.payload(url, filename), expected_payload)
 
     def test_mqtt_config_command(self):
@@ -73,16 +61,12 @@ class TestMQTTCommands(unittest.TestCase):
             "url": url,
         }
 
-        self.assertEqual(
-            MQTTConfig.publish_topic(self.group_id, self.serial), expected_publish_topic
-        )
+        self.assertEqual(MQTTConfig.publish_topic(self.group_id, self.serial), expected_publish_topic)
         self.assertEqual(
             MQTTConfig.response_topic(self.group_id, self.serial),
             expected_response_topic,
         )
-        self.assertEqual(
-            MQTTConfig.state_topic(self.group_id, self.serial), expected_state_topic
-        )
+        self.assertEqual(MQTTConfig.state_topic(self.group_id, self.serial), expected_state_topic)
         self.assertEqual(MQTTConfig.payload(url), expected_payload)
 
     def test_edit_constants_command(self):
@@ -104,15 +88,11 @@ class TestMQTTCommands(unittest.TestCase):
             EditConstants.response_topic(self.group_id, self.serial),
             expected_response_topic,
         )
-        self.assertEqual(
-            EditConstants.state_topic(self.group_id, self.serial), expected_state_topic
-        )
+        self.assertEqual(EditConstants.state_topic(self.group_id, self.serial), expected_state_topic)
         self.assertEqual(EditConstants.payload(**expected_payload), expected_payload)
 
         self.assertEqual(
-            EditConstants.payload(
-                {"const1": "value1", "const2": "value2"}, myconst="myvalue"
-            ),
+            EditConstants.payload({"const1": "value1", "const2": "value2"}, myconst="myvalue"),
             expected_payload,
         )
 
@@ -126,15 +106,9 @@ class TestMQTTCommands(unittest.TestCase):
         expected_state_topic = f"{self.group_id}/state/{self.serial}/"
         expected_payload = {"action": "reboot"}
 
-        self.assertEqual(
-            Reboot.publish_topic(self.group_id, self.serial), expected_publish_topic
-        )
-        self.assertEqual(
-            Reboot.response_topic(self.group_id, self.serial), expected_response_topic
-        )
-        self.assertEqual(
-            Reboot.state_topic(self.group_id, self.serial), expected_state_topic
-        )
+        self.assertEqual(Reboot.publish_topic(self.group_id, self.serial), expected_publish_topic)
+        self.assertEqual(Reboot.response_topic(self.group_id, self.serial), expected_response_topic)
+        self.assertEqual(Reboot.state_topic(self.group_id, self.serial), expected_state_topic)
         self.assertEqual(Reboot.payload(), expected_payload)
 
     def test_file_list_command(self):
@@ -147,20 +121,12 @@ class TestMQTTCommands(unittest.TestCase):
         expected_payload_no_drive = {"action": "list"}
         expected_payload_with_drive = {"action": "list", "drive": drive}
 
-        self.assertEqual(
-            File.publish_topic(self.group_id, self.serial), expected_publish_topic
-        )
-        self.assertEqual(
-            File.response_topic(self.group_id, self.serial), expected_response_topic
-        )
-        self.assertEqual(
-            File.state_topic(self.group_id, self.serial), expected_state_topic
-        )
+        self.assertEqual(File.publish_topic(self.group_id, self.serial), expected_publish_topic)
+        self.assertEqual(File.response_topic(self.group_id, self.serial), expected_response_topic)
+        self.assertEqual(File.state_topic(self.group_id, self.serial), expected_state_topic)
 
         self.assertDictEqual(File.payload("list"), expected_payload_no_drive)
-        self.assertDictEqual(
-            File.payload("list", drive=drive), expected_payload_with_drive
-        )
+        self.assertDictEqual(File.payload("list", drive=drive), expected_payload_with_drive)
         self.assertDictEqual(
             File.payload("list", filename="fake", drive=drive),
             expected_payload_with_drive,
@@ -180,9 +146,7 @@ class TestMQTTCommands(unittest.TestCase):
         }
 
         self.assertDictEqual(File.payload(action, filename), expected_payload_no_drive)
-        self.assertDictEqual(
-            File.payload(action, filename, drive), expected_payload_with_drive
-        )
+        self.assertDictEqual(File.payload(action, filename, drive), expected_payload_with_drive)
 
         with self.assertRaises(RuntimeError):
             File.payload(action)
@@ -198,15 +162,9 @@ class TestMQTTCommands(unittest.TestCase):
         expected_response_topic = f"{self.group_id}/cr/{self.serial}/setting"
         expected_state_topic = f"{self.group_id}/state/{self.serial}/"
 
-        self.assertEqual(
-            Settings.publish_topic(self.group_id, self.serial), expected_publish_topic
-        )
-        self.assertEqual(
-            Settings.response_topic(self.group_id, self.serial), expected_response_topic
-        )
-        self.assertEqual(
-            Settings.state_topic(self.group_id, self.serial), expected_state_topic
-        )
+        self.assertEqual(Settings.publish_topic(self.group_id, self.serial), expected_publish_topic)
+        self.assertEqual(Settings.response_topic(self.group_id, self.serial), expected_response_topic)
+        self.assertEqual(Settings.state_topic(self.group_id, self.serial), expected_state_topic)
 
         setting_name = "PakBusAddress"
         expected_payload_no_apply = {
@@ -221,9 +179,7 @@ class TestMQTTCommands(unittest.TestCase):
             "apply": True,
         }
 
-        self.assertDictEqual(
-            Settings.payload("set", setting_name, "2"), expected_payload_no_apply
-        )
+        self.assertDictEqual(Settings.payload("set", setting_name, "2"), expected_payload_no_apply)
         self.assertDictEqual(
             Settings.payload("set", setting_name, "2", apply=True),
             expected_payload_apply,
@@ -257,9 +213,7 @@ class TestMQTTCommands(unittest.TestCase):
         expected_payload = {"action": "apply", "apply": True}
 
         self.assertDictEqual(Settings.payload("apply"), expected_payload)
-        self.assertDictEqual(
-            Settings.payload("apply", "name", "value", apply=False), expected_payload
-        )
+        self.assertDictEqual(Settings.payload("apply", "name", "value", apply=False), expected_payload)
 
     def test_get_variable(self):
         """Test the GetVar command"""
@@ -268,15 +222,9 @@ class TestMQTTCommands(unittest.TestCase):
         expected_response_topic = f"{self.group_id}/cr/{self.serial}/GetVar"
         expected_state_topic = f"{self.group_id}/state/{self.serial}/"
 
-        self.assertEqual(
-            GetVar.publish_topic(self.group_id, self.serial), expected_publish_topic
-        )
-        self.assertEqual(
-            GetVar.response_topic(self.group_id, self.serial), expected_response_topic
-        )
-        self.assertEqual(
-            GetVar.state_topic(self.group_id, self.serial), expected_state_topic
-        )
+        self.assertEqual(GetVar.publish_topic(self.group_id, self.serial), expected_publish_topic)
+        self.assertEqual(GetVar.response_topic(self.group_id, self.serial), expected_response_topic)
+        self.assertEqual(GetVar.state_topic(self.group_id, self.serial), expected_state_topic)
 
         expected_payload = {"name": "MyVar"}
         self.assertDictEqual(GetVar.payload("MyVar"), expected_payload)
@@ -288,15 +236,9 @@ class TestMQTTCommands(unittest.TestCase):
         expected_response_topic = f"{self.group_id}/cr/{self.serial}/SetVar"
         expected_state_topic = f"{self.group_id}/state/{self.serial}/"
 
-        self.assertEqual(
-            SetVar.publish_topic(self.group_id, self.serial), expected_publish_topic
-        )
-        self.assertEqual(
-            SetVar.response_topic(self.group_id, self.serial), expected_response_topic
-        )
-        self.assertEqual(
-            SetVar.state_topic(self.group_id, self.serial), expected_state_topic
-        )
+        self.assertEqual(SetVar.publish_topic(self.group_id, self.serial), expected_publish_topic)
+        self.assertEqual(SetVar.response_topic(self.group_id, self.serial), expected_response_topic)
+        self.assertEqual(SetVar.state_topic(self.group_id, self.serial), expected_state_topic)
 
         expected_payload = {"name": "MyVar", "value": "55"}
         self.assertDictEqual(SetVar.payload("MyVar", "55"), expected_payload)
@@ -316,9 +258,7 @@ class TestMQTTCommands(unittest.TestCase):
             HistoricData.response_topic(self.group_id, self.serial),
             expected_response_topic,
         )
-        self.assertEqual(
-            HistoricData.state_topic(self.group_id, self.serial), expected_state_topic
-        )
+        self.assertEqual(HistoricData.state_topic(self.group_id, self.serial), expected_state_topic)
 
         start = "2025"
         end = "2026"
@@ -341,9 +281,7 @@ class TestMQTTCommands(unittest.TestCase):
             TalkThru.response_topic(self.group_id, self.serial),
             expected_response_topic,
         )
-        self.assertEqual(
-            TalkThru.state_topic(self.group_id, self.serial), expected_state_topic
-        )
+        self.assertEqual(TalkThru.state_topic(self.group_id, self.serial), expected_state_topic)
 
         port = "COM1"
         out_string = "test me"

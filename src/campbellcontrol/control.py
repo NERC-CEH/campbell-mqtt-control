@@ -224,9 +224,7 @@ class File(Command):
 
         if action in ["delete", "run"]:
             if not filename:
-                raise RuntimeError(
-                    f"`filename` is a requirement argument for the `{action}` action"
-                )
+                raise RuntimeError(f"`filename` is a requirement argument for the `{action}` action")
             return cls._file_action(action, filename, drive)
         if action == "list":
             return cls._list_files(drive)
@@ -234,9 +232,7 @@ class File(Command):
             return cls._stop_program()
 
     @staticmethod
-    def _file_action(
-        action: str, filename: str, drive: Optional[str] = None
-    ) -> FileActionPayload:
+    def _file_action(action: str, filename: str, drive: Optional[str] = None) -> FileActionPayload:
         output = {
             "action": action,
             "fileName": filename,
@@ -285,9 +281,7 @@ class Settings(Command):
             return cls._publish(name)
 
         if not value:
-            raise RuntimeError(
-                f"`value` argument is required for the `{action}` action"
-            )
+            raise RuntimeError(f"`value` argument is required for the `{action}` action")
 
         if action == "set":
             return cls._set(name, value, apply)
