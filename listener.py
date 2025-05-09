@@ -5,7 +5,7 @@ conn.connect()
 conn.subscribe("cs/v2/+/QU8Q-9JTY-HVP8")
 conn.subscribe("cs/v2/+/QU8Q-9JTY-HVP8/#")
 conn.subscribe("cs/v2/#")
-conn.subscribe("#")
+# conn.subscribe("#")
 
 
 conn.client.loop_forever()

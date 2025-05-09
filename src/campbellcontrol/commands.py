@@ -138,9 +138,10 @@ class Command(ABC):
             return {
                 "payload": payload,
                 "success": False,
+                "error": payload["error"],
             }
         elif "success" in payload:
-            return {"payload": payload, "success": True, "error": payload["error"]}
+            return {"payload": payload, "success": True}
         else:
             return None
 
@@ -150,6 +151,7 @@ class OS(Command):
 
     command_name = "OS"
 
+    @staticmethod
     def payload(url: str) -> URLPayload:
         """Return the payload for the OS command."""
         return {"url": url}
@@ -162,6 +164,7 @@ class Program(Command):
 
     command_name = "program"
 
+    @staticmethod
     def payload(url: str, filename: str) -> FileDownloadPayload:
         """Return the payload for the Program command.
         Args:
@@ -179,6 +182,7 @@ class MQTTConfig(Command):
 
     command_name = "mqttConfig"
 
+    @staticmethod
     def payload(url: str) -> URLPayload:
         """Return the payload for the MQTTConfig command.
         Args:
@@ -196,6 +200,7 @@ class EditConstants(Command):
 
     command_name = "editConst"
 
+    @staticmethod
     def payload(*args, **kwargs) -> Dict[str, str]:
         """Return the payload for the EditConstants command."""
         output = dict()
@@ -213,6 +218,7 @@ class Reboot(Command):
 
     command_name = "reboot"
 
+    @staticmethod
     def payload() -> ActionPayload:
         """Return the payload for the Reboot command."""
         return {"action": "reboot"}
@@ -230,6 +236,22 @@ class ListFiles(Command):
             output.update({"drive": drive})
         return output
 
+    def handler(self, topic: str, payload: str) -> Optional[CommandResponse]:
+        """Handler for returning a list of files"""
+        payload = json.loads(payload)
+
+        if "fileList" in payload:
+            return {
+                "payload": payload,
+                "success": True,
+            }
+        elif "error" in payload:
+            return {
+                "payload": payload,
+                "success": False,
+                "error": payload["error"],
+            }
+
 
 class DeleteFile(Command):
     """Command to delete a file on the logger."""
@@ -245,13 +267,19 @@ class DeleteFile(Command):
 
 
 class StopProgram(Command):
-    def payload(self) -> ActionPayload:
+    command_name = "fileControl"
+
+    @staticmethod
+    def payload() -> ActionPayload:
         """Return the payload for the StopProgram command."""
         return {"action": "stop"}
 
 
 class RunProgram(Command):
-    def payload(self, filename: str) -> ActionPayload:
+    command_name = "fileControl"
+
+    @staticmethod
+    def payload(filename: str) -> ActionPayload:
         """Return the payload for the StopProgram command."""
         return {"action": "run", "fileName": filename}
 

@@ -5,7 +5,6 @@ import json
 conn = PahoConnection("localhost", 1883)
 conn.connect()
 
-command = commands.Settings
 base_topic = "cs/v2"
 serial = "QU8Q-9JTY-HVP8"
 

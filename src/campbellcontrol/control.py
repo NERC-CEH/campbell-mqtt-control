@@ -1,12 +1,15 @@
+import logging
 import time
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
-from typing import Any
+from typing import Any, Optional
 
 from paho.mqtt.client import Client, MQTTMessage
 
-from campbellcontrol.commands import Command
+from campbellcontrol.commands import Command, CommandResponse
 from campbellcontrol.connection.interface import Connection
+
+logger = logging.getLogger(__name__)
 
 
 class CommandHandler(ABC):
@@ -36,10 +39,11 @@ class PahoCommandHandler(CommandHandler):
         if response:
             self.response = response
 
-    def send_command(self, command: Command, *args, timeout: int = 10, **kwargs) -> None:
+    def send_command(self, command: Command, *args, timeout: int = 20, **kwargs) -> Optional[CommandResponse]:
         start_time = datetime.now()
         end_time = start_time + timedelta(seconds=timeout)
         self.command = command
+        self.response = None
         self.client.connect()
 
         payload = command.json_payload(*args, **kwargs)
@@ -51,7 +55,7 @@ class PahoCommandHandler(CommandHandler):
 
         while not self.response:
             if datetime.now() > end_time:
-                print("Timeout waiting for response")
+                logger.info("Timeout waiting for response")
                 break
             time.sleep(0.1)
 
@@ -59,8 +63,7 @@ class PahoCommandHandler(CommandHandler):
         self.client.disconnect()
         if self.response:
             if self.response["success"]:
-                print("Command executed successfully")
+                logger.info("Command executed successfully")
             else:
-                print("Command execution failed")
-
-            print("Response:", self.response)
+                logger.info("Command execution failed")
+            return self.response

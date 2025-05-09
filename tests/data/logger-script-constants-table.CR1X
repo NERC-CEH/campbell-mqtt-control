@@ -1,9 +1,7 @@
 Public PTemp, Batt_volt
-
 ConstTable
 	Const A = 1
 EndConstTable
-
 DataTable (Test,1,-1)
 	DataInterval (0,1,Sec,10)
 	Sample (1,PTemp,FP2)
