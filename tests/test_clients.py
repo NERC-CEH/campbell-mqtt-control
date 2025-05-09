@@ -3,6 +3,7 @@ from unittest.mock import patch, MagicMock
 from campbellcontrol.connection.generic import PahoConnection
 from campbellcontrol.connection.interface import Connection
 import paho.mqtt.client
+from paho.mqtt.client import MQTTMessage
 from typing import Callable
 
 
@@ -22,7 +23,9 @@ class TestPahoClient(TestCase):
 
     @patch("logging.info")
     def test_on_message(self, mock):
-        PahoConnection._on_message("client", "userdata", MagicMock())
+        client = PahoConnection("endpoint", 1883)
+        msg = MQTTMessage(topic=b"topic")
+        PahoConnection._on_message(client, "userdata", msg)
         self.assertTrue(mock.called)
 
     @patch("logging.info")

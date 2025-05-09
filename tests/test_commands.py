@@ -1,5 +1,5 @@
 import unittest
-from campbellcontrol.control import (
+from campbellcontrol.commands import (
     OS,
     Program,
     MQTTConfig,

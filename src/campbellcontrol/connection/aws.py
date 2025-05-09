@@ -1,5 +1,4 @@
 import logging
-import time
 from typing import Callable
 
 import awscrt.mqtt
@@ -90,13 +89,3 @@ class AWSConnection(Connection):
     @staticmethod
     def _on_message(topic: str, payload: bytes, dup: bool, qos: QoS, retain: bool, **kwargs) -> None:
         logger.info(f"Received message from topic: {topic} with payload: {payload.decode()}")
-
-
-connection = AWSConnection("myclient", "test.mosquitto.org", 1883)
-connection.connect()
-connection.subscribe("test")
-connection.publish("test", "Hello, world!", QoS.AT_LEAST_ONCE)
-
-while True:
-    time.sleep(1)
-connection.disconnect()
