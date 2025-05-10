@@ -152,18 +152,9 @@ class TestPahoCommandHandler(TestCase):
         self.assertDictEqual(response, expected)
 
 
-class TestAWSCommandHandler(TestCase):
+class TestAWSCommandHandler(TestPahoCommandHandler):
     def setUp(self):
         self.base_topic = "cs/v2"
         self.serial = "QU8Q-9JTY-HVP8"
-        self.client = AWSConnection("test.mosquitto.org", 1883)
-        self.command_handler = PahoCommandHandler(self.client)
-
-    def test_list_files(self):
-        command = commands.ListFiles(self.base_topic, self.serial)
-        response = self.command_handler.send_command(command)
-
-        self.assertEqual(response["success"], True)
-        self.assertIn("fileList", response["payload"])
-        self.assertIsInstance(response["payload"]["fileList"], list)
-        self.assertEqual(response["payload"]["drive"], "CPU:")
+        self.client = AWSConnection("testclient", "test.mosquitto.org", 1883)
+        self.command_handler = AWSCommandHandler(self.client)
