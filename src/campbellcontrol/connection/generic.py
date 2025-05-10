@@ -35,7 +35,7 @@ class PahoConnection(Connection):
         reason_code: ReasonCode,
         properties: Properties,
     ) -> None:
-        logging.info(f"Connected with result code {reason_code}")
+        logger.info(f"Connected with result code {reason_code}")
 
     @staticmethod
     def _on_disconnect(
@@ -46,12 +46,12 @@ class PahoConnection(Connection):
         properties: Properties,
     ) -> None:
         if reason_code != 0:
-            logging.error(f"Unexpected disconnection: {reason_code}")
+            logger.error(f"Unexpected disconnection: {reason_code}")
         else:
-            logging.info("Disconnected successfully")
+            logger.info("Disconnected successfully")
 
     def _on_message(self, client: Client, userdata: Any, msg: MQTTMessage) -> None:
-        print("Message received bby:", msg.topic, msg.payload)
+        logger.info(f"Default message handler: {msg.topic}, {msg.payload}")
         self.response = msg.payload
 
     @staticmethod
@@ -63,8 +63,7 @@ class PahoConnection(Connection):
         properties: Properties,
     ) -> None:
         """Callback for when a subscription is made."""
-        print("SUBBB")
-        logging.info(f"Subscribed: {mid} {reason_code_list}")
+        logger.info(f"Subscribed: {mid} {reason_code_list} {properties}")
 
     @staticmethod
     def _on_unsubscribe(
@@ -75,4 +74,4 @@ class PahoConnection(Connection):
         properties: Properties,
     ) -> None:
         """Callback for when an unsubscription is made."""
-        logging.info(f"Unsubscribed: {mid} {reason_code_list}")
+        logger.info(f"Unsubscribed: {mid} {reason_code_list} {properties}")

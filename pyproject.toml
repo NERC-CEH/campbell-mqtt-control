@@ -30,9 +30,9 @@ include = ["campbellcontrol*"]
 
 [tool.pytest.ini_options]
 
-addopts = "--cov=campbellcontrol"
+addopts = "-m 'not hardware' --cov=campbellcontrol"
 markers = [
-    "slow: Marks slow tests",
+    "hardware: Tests that require a logger connected",
 ]
 
 filterwarnings = [

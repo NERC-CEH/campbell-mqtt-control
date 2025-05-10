@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class CommandHandler(ABC):
     client: Connection
-    response: str = None
+    response: Any = None
 
     def __init__(self, client: Connection):
         self.client = client
@@ -30,7 +30,6 @@ class CommandHandler(ABC):
 
 class PahoCommandHandler(CommandHandler):
     command: Command
-    response: Any = None
 
     def handle_response(self, client: Client, userdata: Any, msg: MQTTMessage) -> None:
         """Handle the response from the logger."""
@@ -67,3 +66,13 @@ class PahoCommandHandler(CommandHandler):
             else:
                 logger.info("Command execution failed")
             return self.response
+
+
+class AWSCommandHandler(CommandHandler):
+    def send_command(self, command: Command, *args, **kwargs) -> Optional[CommandResponse]:
+        """Send a command to the logger."""
+        self.client.connect()
+        payload = command.json_payload(*args, **kwargs)
+        topic = command.publish_topic
+        self.client.publish(topic, payload)
+        self.client.disconnect()

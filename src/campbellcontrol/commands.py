@@ -120,7 +120,7 @@ class Command(ABC):
     def __init__(self, group_id: str, serial: str) -> None:
         self.publish_topic = f"{group_id}/cc/{serial}/{self.command_name}"
         self.response_topic = f"{group_id}/cr/{serial}/{self.command_name}"
-        self.state_topic = f"{group_id}/state/{serial}/{self.command_name}"
+        self.state_topic = f"{group_id}/state/{serial}/"
 
     @abstractmethod
     def payload(*args, **kwargs) -> Any:
@@ -354,6 +354,7 @@ class TalkThru(Command):
     command_name = "talkThru"
 
     def payload(
+        self,
         com_port: str,
         out_string: str,
         num_tries: Optional[str] = None,

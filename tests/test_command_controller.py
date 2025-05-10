@@ -1,13 +1,16 @@
 from unittest import TestCase, main
-from campbellcontrol.control import PahoCommandHandler
+from campbellcontrol.control import PahoCommandHandler, AWSCommandHandler
 from campbellcontrol.connection.generic import PahoConnection
+from campbellcontrol.connection.aws import AWSConnection
 import campbellcontrol.commands as commands
 import logging
+import pytest
 
 logging.basicConfig(level=logging.DEBUG)
 
 
-class TestPahoCOmmandHandler(TestCase):
+@pytest.mark.hardware
+class TestPahoCommandHandler(TestCase):
     def setUp(self):
         self.base_topic = "cs/v2"
         self.serial = "QU8Q-9JTY-HVP8"
@@ -147,3 +150,20 @@ class TestPahoCOmmandHandler(TestCase):
         }
 
         self.assertDictEqual(response, expected)
+
+
+class TestAWSCommandHandler(TestCase):
+    def setUp(self):
+        self.base_topic = "cs/v2"
+        self.serial = "QU8Q-9JTY-HVP8"
+        self.client = AWSConnection("test.mosquitto.org", 1883)
+        self.command_handler = PahoCommandHandler(self.client)
+
+    def test_list_files(self):
+        command = commands.ListFiles(self.base_topic, self.serial)
+        response = self.command_handler.send_command(command)
+
+        self.assertEqual(response["success"], True)
+        self.assertIn("fileList", response["payload"])
+        self.assertIsInstance(response["payload"]["fileList"], list)
+        self.assertEqual(response["payload"]["drive"], "CPU:")

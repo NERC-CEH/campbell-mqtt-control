@@ -21,20 +21,20 @@ class TestPahoClient(TestCase):
         self.assertEqual(client.client.on_subscribe, client._on_subscribe)
         self.assertEqual(client.client.on_unsubscribe, client._on_unsubscribe)
 
-    @patch("logging.info")
+    @patch("campbellcontrol.connection.generic.logger.info")
     def test_on_message(self, mock):
         client = PahoConnection("endpoint", 1883)
         msg = MQTTMessage(topic=b"topic")
-        PahoConnection._on_message(client, "userdata", msg)
+        client._on_message(client, "userdata", msg)
         self.assertTrue(mock.called)
 
-    @patch("logging.info")
+    @patch("campbellcontrol.connection.generic.logger.info")
     def test_on_connect(self, mock):
         PahoConnection._on_connect(1, 2, 3, 4, 5)
         self.assertTrue(mock.called)
 
-    @patch("logging.info")
-    @patch("logging.error")
+    @patch("campbellcontrol.connection.generic.logger.info")
+    @patch("campbellcontrol.connection.generic.logger.error")
     def test_on_disconnect(self, mock_error, mock_info):
         # non-zero reason code should log an error
         PahoConnection._on_disconnect("client", "userdata", "flags", 1, "properties")
@@ -43,12 +43,12 @@ class TestPahoClient(TestCase):
         PahoConnection._on_disconnect("client", "userdata", "flags", 0, "properties")
         self.assertTrue(mock_info.called)
 
-    @patch("logging.info")
+    @patch("campbellcontrol.connection.generic.logger.info")
     def test_on_subscribe(self, mock):
         PahoConnection._on_subscribe(1, 2, 3, 4, 5)
         self.assertTrue(mock.called)
 
-    @patch("logging.info")
+    @patch("campbellcontrol.connection.generic.logger.info")
     def test_on_unsubscribe(self, mock):
         PahoConnection._on_unsubscribe(1, 2, 3, 4, 5)
         self.assertTrue(mock.called)
