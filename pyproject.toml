@@ -30,7 +30,7 @@ include = ["campbellcontrol*"]
 
 [tool.pytest.ini_options]
 
-addopts = "-m 'not hardware' --cov=campbellcontrol"
+addopts = "-m 'not hardware' --cov=campbellcontrol --cov-report=term-missing"
 markers = [
     "hardware: Tests that require a logger connected",
 ]

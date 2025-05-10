@@ -304,5 +304,62 @@ class TestMQTTCommands(unittest.TestCase):
         )
 
 
+class TestHandlers(unittest.TestCase):
+    def setUp(self) -> None:
+        self.group_id = "loggers/cr6"
+        self.serial = "ABC#123!"
+
+    def test_base_handler_success(self):
+        """Test the base handler payload"""
+        payload = b'{"success": "Did a thing"}'
+        expected_payload = {"payload": {"success": "Did a thing"}, "success": True}
+        self.assertDictEqual(commands.Command.handler("topic", payload), expected_payload)
+
+    def test_base_handler_error(self):
+        """Test the base handler payload"""
+        payload = b'{"error": "Did the wrong thing"}'
+        expected_payload = {
+            "payload": {"error": "Did the wrong thing"},
+            "success": False,
+            "error": "Did the wrong thing",
+        }
+        self.assertDictEqual(commands.Command.handler("topic", payload), expected_payload)
+
+    def test_unexpected_payload(self):
+        """Test when an unexpected payload is received"""
+        payload = b'{"unexpected": "Did something"}'
+        expected = None
+        self.assertEqual(commands.Command.handler("topic", payload), expected)
+
+    def test_list_files_handler(self):
+        """Test the list files handler"""
+        payload = b'{"fileList": ["file1", "file2"]}'
+        expected_payload = {"payload": {"fileList": ["file1", "file2"]}, "success": True}
+        self.assertDictEqual(commands.ListFiles.handler("topic", payload), expected_payload)
+
+    def test_list_files_handler_error(self):
+        """Test the list files handler"""
+        payload = b'{"error": "Did the wrong thing"}'
+        expected_payload = {
+            "payload": {"error": "Did the wrong thing"},
+            "success": False,
+            "error": "Did the wrong thing",
+        }
+        self.assertDictEqual(commands.ListFiles.handler("topic", payload), expected_payload)
+
+    def test_talkthru_handler(self):
+        """Test the talkThru handler"""
+        payload = b'{"response": "Did a thing"}'
+        expected_payload = {"payload": {"response": "Did a thing"}, "success": True}
+        self.assertDictEqual(commands.TalkThru.handler("topic", payload), expected_payload)
+
+    def test_talkthru_handler_error(self):
+        """Test the talkThru handler"""
+        payload = b'{"error": "Did the wrong thing"}'
+
+        with self.assertRaises(RuntimeError):
+            commands.TalkThru.handler("topic", payload)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -130,7 +130,8 @@ class Command(ABC):
         """Jsonified payload string"""
         return json.dumps(self.payload(*args, **kwargs))
 
-    def handler(self, topic: str, payload: str) -> Optional[CommandResponse]:
+    @staticmethod
+    def handler(topic: str, payload: str) -> Optional[CommandResponse]:
         """Handler for payloads that always have either a 'success' or 'error' value."""
         payload = json.loads(payload)
 
@@ -236,7 +237,8 @@ class ListFiles(Command):
             output.update({"drive": drive})
         return output
 
-    def handler(self, topic: str, payload: str) -> Optional[CommandResponse]:
+    @staticmethod
+    def handler(topic: str, payload: str) -> Optional[CommandResponse]:
         """Handler for returning a list of files"""
         payload = json.loads(payload)
 
@@ -374,7 +376,8 @@ class TalkThru(Command):
 
         return output
 
-    def handler(self, topic: str, payload: str) -> Optional[CommandResponse]:
+    @staticmethod
+    def handler(topic: str, payload: str) -> Optional[CommandResponse]:
         """Handler for returning a talkThru response"""
 
         payload = json.loads(payload)
