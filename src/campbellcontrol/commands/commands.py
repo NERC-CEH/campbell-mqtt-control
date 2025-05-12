@@ -47,6 +47,7 @@ class Command(ABC):
 
     def __init__(self, group_id: str, serial: str) -> None:
         """Initializes the class. The topics should match that used by the target logger
+
         Args:
             group_id: The base topic used by the logger.
             serial: The serial number of the target logger
@@ -61,6 +62,7 @@ class Command(ABC):
 
     def json_payload(self, *args, **kwargs) -> str:
         """Jsonified payload string.
+
         Returns:
             A JSON formatted string payload.
         """
@@ -69,6 +71,7 @@ class Command(ABC):
     @staticmethod
     def handler(topic: str, message: str) -> Optional[CommandResponse]:
         """Handler for messages that always have either a 'success' or 'error' value.
+
         Args:
             topic: The topic that the message is received from.
             message: The received message.
@@ -96,6 +99,7 @@ class OS(Command):
     @staticmethod
     def payload(url: str) -> URLPayload:
         """Return the payload for the OS command.
+
         Returns:
             A payload dictionary"""
         return {"url": url}
@@ -111,6 +115,7 @@ class Program(Command):
     @staticmethod
     def payload(url: str, filename: str) -> FileDownloadPayload:
         """Return the payload for the Program command.
+
         Args:
             url: Url to a Campbell program.
             filename: Name to assign to the download on the logger.
@@ -130,6 +135,7 @@ class MQTTConfig(Command):
     @staticmethod
     def payload(url: str) -> URLPayload:
         """Return the payload for the MQTTConfig command.
+
         Args:
             url: Url to a Campbell proprietary binary formatted settings file.
         Returns:
@@ -148,6 +154,7 @@ class EditConstants(Command):
     @staticmethod
     def payload(*args, **kwargs) -> Dict[str, str]:
         """Return the payload for the EditConstants command.
+
         Args:
             *args: Any quantity of dictionaries.
             **kwargs: Keyword arguments specifying constants and the new value.
@@ -172,6 +179,7 @@ class Reboot(Command):
     @staticmethod
     def payload() -> ActionPayload:
         """Return the payload for the Reboot command.
+
         Returns:
             A dictionary payload.
         """
@@ -186,7 +194,8 @@ class ListFiles(Command):
 
     def payload(self, drive: Optional[str] = None) -> FileListPayload:
         """Build a payload for the file list command.
-        ArgsAttributes:
+
+        Args:
             drive: An optional string specifying the drive to list.
         Returns:
             A dictionary payload.
@@ -199,6 +208,7 @@ class ListFiles(Command):
     @staticmethod
     def handler(topic: str, message: str) -> Optional[CommandResponse]:
         """Handler for returning a list of files.
+
         Args:
             topic: The topic the message was received on.
             message: The message contents in string format.
@@ -227,6 +237,7 @@ class DeleteFile(Command):
 
     def payload(self, filename: str, drive: Optional[str] = None) -> FileActionPayload:
         """Build a payload for the file deletion command.
+
         Args:
             filename: The file to delete.
             drive: An optional string specifying the drive to target.
@@ -247,6 +258,7 @@ class StopProgram(Command):
     @staticmethod
     def payload() -> ActionPayload:
         """Build a payload for the StopProgram command.
+
         Returns:
             A dictionary payload.
         """
@@ -261,6 +273,7 @@ class RunProgram(Command):
     @staticmethod
     def payload(filename: str) -> ActionPayload:
         """Build a payload for the StopProgram command.
+
         Args:
             filename: Name of the file to run.
         Returns:
@@ -276,6 +289,7 @@ class SetSetting(Command):
 
     def payload(self, name: str, value: str, apply: bool = False) -> SettingsSetPayload:
         """Build a payload for the SetSetting command.
+
         Args:
             name: Name of the setting.
             value: New value to set.
@@ -296,6 +310,7 @@ class ApplySettings(Command):
 
     def payload(self) -> SettingsApplyPayload:
         """Build a payload for the ApplySettings command.
+
         Returns:
             A dictionary payload
         """
@@ -309,6 +324,7 @@ class PublishSetting(Command):
 
     def payload(self, name: str) -> SettingsPublishPayload:
         """Build a payload for publishing a setting.
+
         Args:
             name: Name of the setting to publish.
         Returns:
@@ -324,6 +340,7 @@ class SetVar(Command):
 
     def payload(self, name: str, value: str) -> SetVarPayload:
         """Build a ayload for setting a variable.
+
         Args:
             name: Name of the setting to change.
             value: New value for the setting.
@@ -340,6 +357,7 @@ class GetVar(Command):
 
     def payload(self, name: str) -> GetVarPayload:
         """Build a payload for publishing a variable.
+
         Args:
             name: Name of the variable to publish.
         Returns:
@@ -355,6 +373,7 @@ class HistoricData(Command):
 
     def payload(self, table: str, start: str, end: str) -> HistoricDataPayload:
         """Payload for retrieving historic data from the logger.
+
         Args:
             table: Name of the table on the logger.
             start: Start datetime to query.
@@ -382,6 +401,7 @@ class TalkThru(Command):
             This keeps a session open during which time the port doesn't
             send any data and awaits further TalkThru commands. The session
             times out after 1 minute.
+
         Args:
             comPort: The COM port to talk through.
             outString: String to send to the sensor.
@@ -405,14 +425,21 @@ class TalkThru(Command):
         return output
 
     @staticmethod
-    def handler(topic: str, payload: str) -> Optional[CommandResponse]:
-        """Handler for returning a talkThru response"""
+    def handler(topic: str, message: str) -> Optional[CommandResponse]:
+        """Handler for returning a talkThru response
 
-        payload = json.loads(payload)
+        Args:
+            topic: The message receive topic.
+            message: Value of the message.
+        Returns:
+            A command response or None.
+        """
 
-        if "response" in payload:
+        message = json.loads(message)
+
+        if "response" in message:
             return {
-                "payload": payload,
+                "payload": message,
                 "success": True,
             }
         else:

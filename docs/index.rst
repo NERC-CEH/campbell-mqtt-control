@@ -6,6 +6,8 @@
 My Project documentation
 ========================
 
+Document version: |version|
+
 Welcome to the docs, write your introduction here and explain why your code is great!
 
 .. toctree::

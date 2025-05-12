@@ -31,6 +31,7 @@ class Connection(ABC):
 
     def publish(self, topic: str, payload: str, *args, **kwargs) -> None:
         """Publish a message to a given topic.
+
         Args:
             topic: The topic to publish to.
             payload: The message payload.
@@ -41,12 +42,14 @@ class Connection(ABC):
 
     def subscribe(self, topic: str) -> None:
         """Subscribe to a topic.
+
         Args:
             topic: The topic to subscribe to."""
         self.client.subscribe(topic)
 
     def unsubscribe(self, topic: str) -> None:
         """Unsubscribe from a topic.
+
         Args:
             topic: The topic to unsubscribe from.
         """
