@@ -10,3 +10,5 @@ permissions:
 jobs:
   test-python:
     uses: NERC-CEH/dri-cicd/.github/workflows/test-python.yml@main
+    with:
+      optional_dependencies: "[test,lint,all]"
