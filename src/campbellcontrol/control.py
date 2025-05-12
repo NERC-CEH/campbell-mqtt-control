@@ -1,3 +1,5 @@
+"""Module for sending commands and receiving responses from loggers."""
+
 import logging
 import time
 from abc import ABC, abstractmethod
@@ -7,99 +9,161 @@ from typing import Any, Optional
 from awscrt.mqtt import QoS
 from paho.mqtt.client import Client, MQTTMessage
 
-from campbellcontrol.commands import Command, CommandResponse
+from campbellcontrol.commands.commands import Command, CommandResponse
 from campbellcontrol.connection.interface import Connection
 
 logger = logging.getLogger(__name__)
 
 
 class CommandHandler(ABC):
-    client: Connection
-    command: Command
-    response: Any = None
+    """Interface class for command/response handling.
+    Different MQTT client objects have different signatures
+    for the "on_message" method that must be reduced down to a
+    "topic" and "message" to be processed by the current command instance.
+    There are also different invocations for sending/receiving a command, so
+    multiple CommandHandler classes are needed.
+    """
 
-    def __init__(self, client: Connection):
+    client: Connection
+    """Handle to the broker connection client object."""
+
+    command: Optional[Command] = None
+    """The current control command being sent/received."""
+
+    response: Optional[Any] = None
+    """The latest response. Used to break out of wait state."""
+
+    def __init__(self, client: Connection) -> None:
+        """Initialize the instance.
+        Args:
+            client: A MQTT client object.
+        """
         self.client = client
 
-    @abstractmethod
     def handle_response(self, *args, **kwargs) -> None:
-        """Handle the response from the logger."""
-
-    @abstractmethod
-    def send_command(self, *args, **kwargs) -> None:
-        """Send a command to the logger."""
-
-
-class PahoCommandHandler(CommandHandler):
-    def handle_response(self, client: Client, userdata: Any, msg: MQTTMessage) -> None:
-        """Handle the response from the logger."""
-        response = self.command.handler(msg.topic, msg.payload)
+        """Forwards arguments to the command's handler method."""
+        response = self.command.handler(*args, **kwargs)
 
         if response:
             self.response = response
 
-    def send_command(self, command: Command, *args, timeout: int = 20, **kwargs) -> Optional[CommandResponse]:
-        start_time = datetime.now()
-        end_time = start_time + timedelta(seconds=timeout)
-        self.command = command
+    def reset(self) -> None:
+        """Resets the stateful attributes."""
+        self.command = None
         self.response = None
-        self.client.connect()
 
+    def send_command(self, command: Command, *args, timeout: int = 20, **kwargs) -> Optional[CommandResponse]:
+        """Invokes a given MQTT command and awaits the response until timeout is reached.
+        Args:
+            command: The specified Campbell compatible command.
+            *args: Arguments to pass to the given command.
+            timeout: Time in seconds before the command aborts.
+            **kwargs: Keyword arguments passed to the command.
+        Returns:
+            A CommandResponse dictionary if a response is received, otherwise None.
+        """
+        self.reset()
+
+        # Setting up the instance to track the command
+        end_time = datetime.now() + timedelta(seconds=timeout)
+        self.command = command
         payload = command.json_payload(*args, **kwargs)
-        topic = command.publish_topic
-        self.client.client.on_message = self.handle_response
-        self.client.subscribe(command.response_topic)
-        self.client.client.loop_start()
-        self.client.publish(topic, payload)
 
+        self.client.connect()
+        self._initiate_send(command, payload)
+
+        # Blocking wait until a response is received or timeout reached
         while not self.response:
             if datetime.now() > end_time:
                 logger.info("Timeout waiting for response")
                 break
             time.sleep(0.1)
 
-        self.client.client.loop_stop()
+        self._terminate_send(command)
         self.client.disconnect()
+
+        # Report outcome
         if self.response:
             if self.response["success"]:
                 logger.info("Command executed successfully")
             else:
                 logger.info("Command execution failed")
             return self.response
+
+    @abstractmethod
+    def _initiate_send(self, command: Command, payload: dict) -> None:
+        """Prepares client, sends command, and subscribes to the result.
+        Args:
+            command: The command the send.
+            payload: Payload to send.
+        """
+
+    @abstractmethod
+    def _terminate_send(self, command: Command) -> None:
+        """Restores the client to the prior state, unsubscribes from topics.
+        Args:
+            command: The command that was sent.
+        """
+
+
+class PahoCommandHandler(CommandHandler):
+    """Handler class for the generic PAHO based clients."""
+
+    def handle_response(self, client: Client, userdata: Any, msg: MQTTMessage) -> None:
+        """Forwards message topic and payload for a message from a logger to
+            the command response handler.
+        Args:
+            client: The MQTT client.
+            userdata: Data defined by the user.
+            msg: The received message.
+        """
+        super().handle_response(msg.topic, msg.payload)
+
+    def _initiate_send(self, command: Command, payload: dict) -> None:
+        """Prepares client, sends command, and subscribes to the result.
+        Args:
+            command: The command the send.
+            payload: Payload to send.
+        """
+
+        # Setting callback handler
+        self.client.client.on_message = self.handle_response
+
+        # Subscribing to response topic
+        self.client.subscribe(command.response_topic)
+
+        # Starting listening behaviour
+        self.client.client.loop_start()
+
+        # Sending the command
+        self.client.publish(command.publish_topic, payload)
+
+    def _terminate_send(self, command: Command) -> None:
+        """Restores the client to the prior state, unsubscribes from topics,
+            ends listen behaviour.
+        Args:
+            command: The command that was sent.
+        """
+        self.client.client.loop_stop()
+        self.client.unsubscribe(command.response_topic)
 
 
 class AWSCommandHandler(CommandHandler):
     def handle_response(self, topic: str, payload: bytes, dup: bool, qos: QoS, retain: bool, **kwargs) -> None:
-        response = self.command.handler(topic, payload)
+        super().handle_response(topic, payload)
 
-        if response:
-            self.response = response
-
-    def send_command(self, command: Command, *args, timeout: int = 30, **kwargs) -> Optional[CommandResponse]:
-        """Send a command to the logger."""
-        start_time = datetime.now()
-        end_time = start_time + timedelta(seconds=timeout)
-
-        self.command = command
-        self.response = None
-
-        self.client.connect()
-        payload = command.json_payload(*args, **kwargs)
-        topic = command.publish_topic
+    def _initiate_send(self, command: Command, payload: dict) -> None:
+        """Prepares client, sends command, and subscribes to the result.
+        Args:
+            command: The command the send.
+            payload: Payload to send.
+        """
         self.client.subscribe(command.response_topic, qos=QoS.EXACTLY_ONCE, callback=self.handle_response)
-        self.client.publish(topic, payload, QoS.AT_LEAST_ONCE)
+        self.client.publish(command.publish_topic, payload, QoS.AT_LEAST_ONCE)
 
-        while not self.response:
-            if datetime.now() > end_time:
-                logger.info("Timeout waiting for response")
-                break
-            time.sleep(0.1)
-
-        self.client.disconnect()
-
-        if self.response:
-            if self.response["success"]:
-                logger.info("Command executed successfully")
-            else:
-                logger.info("Command execution failed")
-            return self.response
+    def _terminate_send(self, command: Command) -> None:
+        """Restores the client to the prior state, unsubscribes from topics.
+        Args:
+            command: The command that was sent.
+        """
+        self.client.unsubscribe(command.response_topic)

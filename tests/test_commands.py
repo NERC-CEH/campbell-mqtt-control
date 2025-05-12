@@ -1,6 +1,5 @@
 import unittest
-from campbellcontrol import commands
-from parameterized import parameterized
+from campbellcontrol.commands import commands
 
 
 class TestMQTTCommands(unittest.TestCase):
