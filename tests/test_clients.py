@@ -1,10 +1,8 @@
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 from campbellcontrol.connection.generic import PahoConnection
-from campbellcontrol.connection.interface import Connection
 import paho.mqtt.client
 from paho.mqtt.client import MQTTMessage
-from typing import Callable
 
 
 class TestPahoClient(TestCase):
