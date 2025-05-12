@@ -54,6 +54,7 @@ class CommandHandler(ABC):
 
     def send_command(self, command: Command, *args, timeout: int = 20, **kwargs) -> Optional[CommandResponse]:
         """Invokes a given MQTT command and awaits the response until timeout is reached.
+
         Args:
             command: The specified Campbell compatible command.
             *args: Arguments to pass to the given command.
@@ -112,6 +113,7 @@ class PahoCommandHandler(CommandHandler):
     def handle_response(self, client: Client, userdata: Any, msg: MQTTMessage) -> None:
         """Forwards message topic and payload for a message from a logger to
             the command response handler.
+
         Args:
             client: The MQTT client.
             userdata: Data defined by the user.
