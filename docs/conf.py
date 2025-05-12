@@ -8,7 +8,7 @@
 
 import campbellcontrol
 
-project = 'My Project'
+project = 'Campbell MQTT Commander'
 copyright = '2024, UKCEH'
 author = 'UKCEH'
 

@@ -1,5 +1,5 @@
 campbellcontrol
-=========
+===============
 
 .. toctree::
    :maxdepth: 4
