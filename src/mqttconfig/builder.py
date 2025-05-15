@@ -3,7 +3,7 @@
 from struct import pack
 
 
-def example_file_build():
+def example_file_build() -> None:
     """Builds a settings file that will update the MQTT endpoint to "test.mosquitto.org"."""
     with open("mqtt.bin", "wb") as f:
         # Write the header
