@@ -20,4 +20,7 @@ help:
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 apidoc:
-	@sphinx-apidoc -f ../src/campbellcontrol -o sources
+	@sphinx-apidoc ../src -o sources -f --remove-old
+	@awk 'NR==1 {print "Code Reference"; next} \
+		NR==2 {print "=============="; next} \
+     	{print}' sources/modules.rst > tmp && mv tmp sources/modules.rst

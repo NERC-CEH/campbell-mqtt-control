@@ -2,7 +2,7 @@ from unittest import TestCase, main
 from campbellcontrol.control import PahoCommandHandler, AWSCommandHandler
 from campbellcontrol.connection.generic import PahoConnection
 from campbellcontrol.connection.aws import AWSConnection
-import campbellcontrol.commands as commands
+import campbellcontrol.commands.commands as commands
 import logging
 import pytest
 

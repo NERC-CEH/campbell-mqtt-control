@@ -1,26 +1,59 @@
 # Python Project Template
 
 [![tests badge](https://github.com/NERC-CEH/campbell-mqtt-control/actions/workflows/pipeline.yml/badge.svg)](https://github.com/NERC-CEH/campbell-mqtt-control/actions)
-[![docs badge](https://github.com/NERC-CEH/campbell-mqtt-control/actions/workflows/deploy-docs.yml/badge.svg)](https://nerc-ceh.github.io/campbell-mqtt-control/)
+[![docs badge](https://img.shields.io/badge/Documentation-blue)](https://nerc-ceh.github.io/campbell-mqtt-control/)
 
-[Read the docs!](https://nerc-ceh.github.io/campbell-mqtt-control)
+This is a Python project that allows you to command Campbell data loggers remotely via MQTT messages. This is done by sending specific JSON payloads to special topics that the loggers subscribe to when communicating over MQTT. This app wraps around this feature by handling connections to a MQTT broker and sending payloads to the special topics that the loggers are subscribed to, then listening to a response to evaluate the success or failure.
 
-This repository is a template for a basic Python project. Included here is:
+## How Does it Work?
 
-* Example Python package
-* Tests
-* Documentation
-* Automatic incremental versioning
-* CI/CD
-    * Installs and tests the package
-    * Builds documentation on branches
-    * Deploys documentation on main branch
-    * Deploys docker image to AWS ECR
-* Githook to ensure linting and code checking
+When connected over MQTT, the loggers subscribe and publish to a couple of select topics:
 
-## Getting Started
+* `<base_topic>/cc/<serial_number>/<command_name>`: Logger subscribes to this topic to listen for MQTT commands.
+* `<base_topic>/cr/<serial_number>/<command_name>`: Logger publishes to this topic to return data relating to a previous command request
+* `<base_topic>/state/<serial_number>/`: Logger reports changes to the state. Often has messages while processing a command
 
-### Using the Githook
+For example: Deleting a file on the logger remotely. In a logger with serial number `1234` and using base topic `my/logger`.
+
+* The logger subscribes to topic `my/logger/cc/1234/fileControl`. When a payload is received on this topic, it triggers the logger to delete a file specified in the payload
+* Success is published on topic `/my/logger/cr/1234/fileControl`.
+
+The Python code wraps this logic by publishing commands and subscribing to the response topic.
+
+## What's implemented here
+
+* [Command classes](src/campbellcontrol/commands/commands.py) for generating relevant topics and response handlers that support all commands available in the MQTT API.
+* [Client classes](src/campbellcontrol/connection/interface.py) for connecting to an MQTT broker via [Paho](src/campbellcontrol/connection/generic.py) or [AWS]((src/campbellcontrol/connection/aws.py))
+* [Command Handlers](src/campbellcontrol/control.py) for submitting commands through an MQTT broker and awaiting the response.
+
+## A Simple Workflow
+The example below connects to the public MQTT broker and sends a command instructing a datalogger to delete a file called `myfile.CR1X`.
+```python
+from campbellcontrol.control import PahoCommandHandler
+from campbellcontrol.connection.generic import PahoConnection
+from campbellcontrol.commands.commands import DeleteFile
+
+base_topic = "cs/v2"
+serial = "1234"
+file_to_delete = "myfile.CR1X"
+
+# Create a MQTT client using Paho
+client = PahoConnection("test.mosquitto.org", 1883)
+
+# Instanticating a command handler
+command_handler = PahoCommandHandler(client)
+
+# Create a command targeted to the desired logger
+command = commands.DeleteFile(base_topic, serial)
+
+# Send the command and wait for a response
+response = command_handler.send_command(command, file_to_delete)
+
+print(response)
+```
+## Getting Started For Devs
+
+### Using the Githooks
 
 From the root directory of the repo, run:
 
@@ -64,36 +97,6 @@ The docs, tests, and linter packages can be installed together with:
 pip install -e .[dev]
 ```
 
-### Making it Your Own
-
-This repo has a single package in the `./src/...` path called `campbellcontrol` (creative I know). Change this to the name of your package and update it in:
-
-* `docs/conf.py`
-* `src/**/*.py`
-* `tests/**/*.py`
-* `pyproject.toml`
-
-To make thing move a bit faster, use the script `./rename-package.sh` to rename all references of `campbellcontrol` to whatever you like. For example:
-
-```
-./rename-package.sh "acoolnewname"
-```
-
-Will rename the package and all references to "acoolnewname"
-
-After doing this it is recommended to also run:
-
-```
-cd docs
-make apidoc
-```
-
-To keep your documentation in sync with the package name. You may need to delete a file called `campbellcontrol.rst` from `./docs/sources/...`
-
-### Deploying Docs to GitHub Pages
-
-If you want docs to be published to github pages automatically, go to your repo settings and enable docs from GitHub Actions and the workflows will do the rest.
-
 ### Building Docs Locally
 
 The documentation is driven by [Sphinx](https://www.sphinx-doc.org/) an industry standard for documentation with a healthy userbase and lots of add-ons. It uses `sphinx-apidoc` to generate API documentation for the codebase from Python docstrings.
@@ -133,13 +136,3 @@ This codebase is set up using [autosemver](https://autosemver.readthedocs.io/en/
     * Increments minor version `x.1.x -> x.2.x`
 * Commit starts with `* INCOMPATIBLE:`. Use for API breaking changes
     * Increments major version `2.x.x -> 3.x.x`
-
-### Docker and the ECR
-
-The python code is packaged into a docker image and pushed to the AWS ECR. For the deployment to succeed you must:
-
-* Add 2 secrets to the GitHub Actions:
-    * AWS_REGION: \<our-region\>
-    * AWS_ROLE_ARN: \<the-IAM-role-used-to-deploy\>
-* Add a repository to the ECR with the same name as the GitHub repo
- 

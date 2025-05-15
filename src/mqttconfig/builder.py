@@ -1,7 +1,12 @@
+"""This is a temporary module showing an example invocation of how to create a MQTT settings file."""
+
 from struct import pack
 
-with open("mqtt.bin", "wb") as f:
-    # Write the header
-    f.write(pack(">H", 0x0020))
-    f.write(pack(">HH", 0x0005, 18) + b"test.mosquitto.org")
-    f.write(b"\x00")
+
+def example_file_build() -> None:
+    """Builds a settings file that will update the MQTT endpoint to "test.mosquitto.org"."""
+    with open("mqtt.bin", "wb") as f:
+        # Write the header
+        f.write(pack(">H", 0x0020))
+        f.write(pack(">HH", 0x0005, 18) + b"test.mosquitto.org")
+        f.write(b"\x00")
