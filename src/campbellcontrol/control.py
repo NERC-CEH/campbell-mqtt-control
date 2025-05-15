@@ -52,7 +52,9 @@ class CommandHandler(ABC):
         self.command = None
         self.response = None
 
-    def send_command(self, command: Command, *args, timeout: int = 20, **kwargs) -> Optional[CommandResponse]:
+    def send_command(
+        self, command: Command, *args, timeout: int = 20, **kwargs
+    ) -> Optional[CommandResponse]:
         """Invokes a given MQTT command and awaits the response until timeout is reached.
 
         Args:
@@ -151,7 +153,9 @@ class PahoCommandHandler(CommandHandler):
 
 
 class AWSCommandHandler(CommandHandler):
-    def handle_response(self, topic: str, payload: bytes, dup: bool, qos: QoS, retain: bool, **kwargs) -> None:
+    def handle_response(
+        self, topic: str, payload: bytes, dup: bool, qos: QoS, retain: bool, **kwargs
+    ) -> None:
         super().handle_response(topic, payload)
 
     def _initiate_send(self, command: Command, payload: dict) -> None:
@@ -160,7 +164,9 @@ class AWSCommandHandler(CommandHandler):
             command: The command the send.
             payload: Payload to send.
         """
-        self.client.subscribe(command.response_topic, qos=QoS.EXACTLY_ONCE, callback=self.handle_response)
+        self.client.subscribe(
+            command.response_topic, qos=QoS.EXACTLY_ONCE, callback=self.handle_response
+        )
         self.client.publish(command.publish_topic, payload, QoS.AT_LEAST_ONCE)
 
     def _terminate_send(self, command: Command) -> None:
