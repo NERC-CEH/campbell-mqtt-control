@@ -126,6 +126,17 @@ pip install -e .[test]
 pytest
 ```
 
+To run the hardware integration tests, you need a Campbell logger configured to allow connection to an MQTT broker on the topic `cs/v2`. Please see the docs for more info about setting up and testing this. The `-m` switch here is the marker for optional hardware tests.
+
+`py.test -vs -m hardware -serial ABCDEF`
+
+Options
+
+```
+--serial Serial number of the logger, configurable
+--server Address of the MQTT broker to use for testing
+```
+
 ### Automatic Versioning
 
 This codebase is set up using [autosemver](https://autosemver.readthedocs.io/en/latest/usage.html#) a tool that uses git commit history to calculate the package version. Each time you make a commit, it increments the patch version by 1. You can increment by:
