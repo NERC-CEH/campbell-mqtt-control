@@ -8,6 +8,7 @@ Campbell Logger Commander
    :caption: Contents:
 
    self
+   mqtt
    mqtt-settings
    sources/modules
    genindex
