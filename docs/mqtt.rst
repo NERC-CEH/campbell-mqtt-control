@@ -12,7 +12,7 @@ We can use MQTT to remotely communicate with dataloggers that are in the field -
 Mosquitto test instance
 -----------------------
 
-`test.mosquitto.org https://test.mosquitto.org/`_ is a publically available MQTT broker (accepts messages and publishes them) that we have been using for testing. It's a service from the Mosquitto open source project and a) has no guarantees of uptime and b) all traffic is publically visible.
+`test.mosquitto.org <https://test.mosquitto.org/>`_ is a publically available MQTT broker (accepts messages and publishes them) that we have been using for testing. It's a service from the Mosquitto open source project and a) has no guarantees of uptime and b) all traffic is publically visible.
 
 In the even that you're seeing unexpected connection failures, try `mosquitto_sub` to check whether it's handling any traffic at all:
 
