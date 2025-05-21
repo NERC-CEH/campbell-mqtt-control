@@ -28,7 +28,7 @@ class TestPahoCommandHandler(TestCase):
         self.command_handler = PahoCommandHandler(self.client)
 
     def test_list_files(self):
-        command = commands.ListFiles(self.base_topic, self.serial, {"response_suffix": "list"})
+        command = commands.ListFiles(self.base_topic, self.serial, options={"response_suffix": "list"})
         response = self.command_handler.send_command(command)
 
         self.assertEqual(response["success"], True)

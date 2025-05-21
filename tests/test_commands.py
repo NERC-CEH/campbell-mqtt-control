@@ -1,17 +1,20 @@
 import unittest
+import pytest
 from campbellcontrol.commands import commands
 
 
 class TestMQTTCommands(unittest.TestCase):
     def setUp(self) -> None:
         self.group_id = "loggers/cr6"
+        self.model = "cr1000x"
         self.serial = "ABC#123!"
+        self.device_id = f"{self.model}/{self.serial}"
 
     def test_os_command(self):
         """Test the OS command."""
-        expected_publish_topic = f"{self.group_id}/cc/{self.serial}/OS"
-        expected_state_topic = f"{self.group_id}/state/{self.serial}/"
-        expected_response_topic = f"{self.group_id}/cr/{self.serial}/OS"
+        expected_publish_topic = f"{self.group_id}/cc/{self.device_id}/OS"
+        expected_state_topic = f"{self.group_id}/state/{self.device_id}/"
+        expected_response_topic = f"{self.group_id}/cr/{self.device_id}/OS"
 
         url = "http://example.com/firmware.bin"
         expected_payload = {"url": url}
@@ -24,9 +27,9 @@ class TestMQTTCommands(unittest.TestCase):
 
     def test_program_command(self):
         """Test the Program command."""
-        expected_publish_topic = f"{self.group_id}/cc/{self.serial}/program"
-        expected_response_topic = f"{self.group_id}/cr/{self.serial}/program"
-        expected_state_topic = f"{self.group_id}/state/{self.serial}/"
+        expected_publish_topic = f"{self.group_id}/cc/{self.device_id}/program"
+        expected_response_topic = f"{self.group_id}/cr/{self.device_id}/program"
+        expected_state_topic = f"{self.group_id}/state/{self.device_id}/"
 
         url = "http://example.com/programCR6.crb"
         filename = "testScript.crb"
@@ -40,9 +43,9 @@ class TestMQTTCommands(unittest.TestCase):
     def test_mqtt_config_command(self):
         """Test the MQTT setting configuration command."""
 
-        expected_publish_topic = f"{self.group_id}/cc/{self.serial}/mqttConfig"
-        expected_response_topic = f"{self.group_id}/cr/{self.serial}/mqttConfig"
-        expected_state_topic = f"{self.group_id}/state/{self.serial}/"
+        expected_publish_topic = f"{self.group_id}/cc/{self.device_id}/mqttConfig"
+        expected_response_topic = f"{self.group_id}/cr/{self.device_id}/mqttConfig"
+        expected_state_topic = f"{self.group_id}/state/{self.device_id}/"
 
         url = "http://example.com/settings.bin"
         expected_payload = {
@@ -59,11 +62,27 @@ class TestMQTTCommands(unittest.TestCase):
         self.assertEqual(command.state_topic, expected_state_topic)
         self.assertEqual(command.payload(url), expected_payload)
 
+    def test_config_device_options(self):
+        # can't use pytest.mark.parametrize with unittest classes
+        for model in ["cr6", "cr1000x", "madeup"]:
+            expected_publish_topic = f"{self.group_id}/cc/{model}/{self.serial}/mqttConfig"
+            expected_response_topic = f"{self.group_id}/cr/{model}/{self.serial}/mqttConfig"
+            expected_state_topic = f"{self.group_id}/state/{model}/{self.serial}/"
+
+            command = commands.MQTTConfig(self.group_id, self.serial, model)
+
+            self.assertEqual(command.publish_topic, expected_publish_topic)
+            self.assertEqual(
+                command.response_topic,
+                expected_response_topic,
+            )
+            self.assertEqual(command.state_topic, expected_state_topic)
+
     def test_edit_constants_command(self):
         """Test the constants editing command."""
-        expected_publish_topic = f"{self.group_id}/cc/{self.serial}/editConst"
-        expected_response_topic = f"{self.group_id}/cr/{self.serial}/editConst"
-        expected_state_topic = f"{self.group_id}/state/{self.serial}/"
+        expected_publish_topic = f"{self.group_id}/cc/{self.device_id}/editConst"
+        expected_response_topic = f"{self.group_id}/cr/{self.device_id}/editConst"
+        expected_state_topic = f"{self.group_id}/state/{self.device_id}/"
         expected_payload = {
             "const1": "value1",
             "const2": "value2",
@@ -93,9 +112,9 @@ class TestMQTTCommands(unittest.TestCase):
 
     def test_reboot_command(self):
         """Test the reboot command."""
-        expected_publish_topic = f"{self.group_id}/cc/{self.serial}/reboot"
-        expected_response_topic = f"{self.group_id}/cr/{self.serial}/reboot"
-        expected_state_topic = f"{self.group_id}/state/{self.serial}/"
+        expected_publish_topic = f"{self.group_id}/cc/{self.device_id}/reboot"
+        expected_response_topic = f"{self.group_id}/cr/{self.device_id}/reboot"
+        expected_state_topic = f"{self.group_id}/state/{self.device_id}/"
         expected_payload = {"action": "reboot"}
 
         command = commands.Reboot(self.group_id, self.serial)
@@ -106,9 +125,9 @@ class TestMQTTCommands(unittest.TestCase):
 
     def test_file_list_command(self):
         """Test the file list command"""
-        expected_publish_topic = f"{self.group_id}/cc/{self.serial}/fileControl"
-        expected_response_topic = f"{self.group_id}/cr/{self.serial}/fileControl"
-        expected_state_topic = f"{self.group_id}/state/{self.serial}/"
+        expected_publish_topic = f"{self.group_id}/cc/{self.device_id}/fileControl"
+        expected_response_topic = f"{self.group_id}/cr/{self.device_id}/fileControl"
+        expected_state_topic = f"{self.group_id}/state/{self.device_id}/"
         command = commands.ListFiles(self.group_id, self.serial)
         drive = "USR"
         expected_payload_no_drive = {"action": "list"}
@@ -151,9 +170,9 @@ class TestMQTTCommands(unittest.TestCase):
         self.assertDictEqual(command.payload(), expected_payload)
 
     def test_setting_set(self):
-        expected_publish_topic = f"{self.group_id}/cc/{self.serial}/setting"
-        expected_response_topic = f"{self.group_id}/cr/{self.serial}/setting"
-        expected_state_topic = f"{self.group_id}/state/{self.serial}/"
+        expected_publish_topic = f"{self.group_id}/cc/{self.device_id}/setting"
+        expected_response_topic = f"{self.group_id}/cr/{self.device_id}/setting"
+        expected_state_topic = f"{self.group_id}/state/{self.device_id}/"
 
         command = commands.SetSetting(self.group_id, self.serial)
 
@@ -205,9 +224,9 @@ class TestMQTTCommands(unittest.TestCase):
     def test_get_variable(self):
         """Test the GetVar command"""
 
-        expected_publish_topic = f"{self.group_id}/cc/{self.serial}/GetVar"
-        expected_response_topic = f"{self.group_id}/cr/{self.serial}/GetVar"
-        expected_state_topic = f"{self.group_id}/state/{self.serial}/"
+        expected_publish_topic = f"{self.group_id}/cc/{self.device_id}/GetVar"
+        expected_response_topic = f"{self.group_id}/cr/{self.device_id}/GetVar"
+        expected_state_topic = f"{self.group_id}/state/{self.device_id}/"
 
         command = commands.GetVar(self.group_id, self.serial)
 
@@ -221,9 +240,9 @@ class TestMQTTCommands(unittest.TestCase):
     def test_set_variable(self):
         """Test the SetVar command"""
 
-        expected_publish_topic = f"{self.group_id}/cc/{self.serial}/SetVar"
-        expected_response_topic = f"{self.group_id}/cr/{self.serial}/SetVar"
-        expected_state_topic = f"{self.group_id}/state/{self.serial}/"
+        expected_publish_topic = f"{self.group_id}/cc/{self.device_id}/SetVar"
+        expected_response_topic = f"{self.group_id}/cr/{self.device_id}/SetVar"
+        expected_state_topic = f"{self.group_id}/state/{self.device_id}/"
 
         command = commands.SetVar(self.group_id, self.serial)
 
@@ -237,9 +256,9 @@ class TestMQTTCommands(unittest.TestCase):
     def test_historic_data(self):
         """Test the historicData command"""
 
-        expected_publish_topic = f"{self.group_id}/cc/{self.serial}/historicData"
-        expected_response_topic = f"{self.group_id}/cr/{self.serial}/historicData"
-        expected_state_topic = f"{self.group_id}/state/{self.serial}/"
+        expected_publish_topic = f"{self.group_id}/cc/{self.device_id}/historicData"
+        expected_response_topic = f"{self.group_id}/cr/{self.device_id}/historicData"
+        expected_state_topic = f"{self.group_id}/state/{self.device_id}/"
         command = commands.HistoricData(self.group_id, self.serial)
 
         self.assertEqual(
@@ -261,9 +280,9 @@ class TestMQTTCommands(unittest.TestCase):
     def test_talkthru(self):
         """Test the talkThru command"""
 
-        expected_publish_topic = f"{self.group_id}/cc/{self.serial}/talkThru"
-        expected_response_topic = f"{self.group_id}/cr/{self.serial}/talkThru"
-        expected_state_topic = f"{self.group_id}/state/{self.serial}/"
+        expected_publish_topic = f"{self.group_id}/cc/{self.device_id}/talkThru"
+        expected_response_topic = f"{self.group_id}/cr/{self.device_id}/talkThru"
+        expected_state_topic = f"{self.group_id}/state/{self.device_id}/"
 
         command = commands.TalkThru(self.group_id, self.serial)
 

@@ -45,20 +45,26 @@ class Command(ABC):
         the final response
     """
 
-    def __init__(self, group_id: str, serial: str, options: Optional[dict] = {}) -> None:
+    def __init__(
+        self, group_id: str, serial: str, model: Optional[str] = "cr1000x", options: Optional[dict] = {}
+    ) -> None:
         """Initializes the class. The topics should match that used by the target logger
 
         Args:
             group_id: The base topic used by the logger.
             serial: The serial number of the target logger
+            model: optional, default 'cr1000x' - the model number of the logger
         """
-        self.publish_topic = f"{group_id}/cc/{serial}/{self.command_name}"
-        self.response_topic = f"{group_id}/cr/{serial}/{self.command_name}"
+        self.device_id = f"{model}/{serial}"
+        self.publish_topic = f"{group_id}/cc/{self.device_id}/{self.command_name}"
+        self.response_topic = f"{group_id}/cr/{self.device_id}/{self.command_name}"
+        self.state_topic = f"{group_id}/state/{self.device_id}/"
 
         if options and "response_suffix" in options:
-            self.response_topic = f"{self.response_topic}/{options['response_suffix']}"
+            suffix = options["response_suffix"]
+            self.response_topic = f"{self.response_topic}/{suffix}"
 
-        self.state_topic = f"{group_id}/state/{serial}/"
+        self.state_topic = f"{group_id}/state/{self.device_id}/"
 
     @abstractmethod
     def payload(*args, **kwargs) -> Any:
