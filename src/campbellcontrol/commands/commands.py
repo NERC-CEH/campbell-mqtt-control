@@ -45,16 +45,18 @@ class Command(ABC):
         the final response
     """
 
-    def __init__(self, group_id: str, serial: str) -> None:
+    def __init__(self, group_id: str, serial: str, model: Optional[str] = "cr1000x") -> None:
         """Initializes the class. The topics should match that used by the target logger
 
         Args:
             group_id: The base topic used by the logger.
             serial: The serial number of the target logger
+            model: optional, default 'cr1000x' - the model number of the logger
         """
-        self.publish_topic = f"{group_id}/cc/{serial}/{self.command_name}"
-        self.response_topic = f"{group_id}/cr/{serial}/{self.command_name}"
-        self.state_topic = f"{group_id}/state/{serial}/"
+        self.device_id = f"{model}/{serial}"
+        self.publish_topic = f"{group_id}/cc/{self.device_id}/{self.command_name}"
+        self.response_topic = f"{group_id}/cr/{self.device_id}/{self.command_name}"
+        self.state_topic = f"{group_id}/state/{self.device_id}/"
 
     @abstractmethod
     def payload(*args, **kwargs) -> Any:
