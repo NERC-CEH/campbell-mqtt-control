@@ -68,6 +68,7 @@ class CommandHandler(ABC):
         # Setting up the instance to track the command
         end_time = datetime.now() + timedelta(seconds=timeout)
         self.command = command
+
         payload = command.json_payload(*args, **kwargs)
 
         self.client.connect()

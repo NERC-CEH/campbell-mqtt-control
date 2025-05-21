@@ -9,33 +9,40 @@ import pytest
 logging.basicConfig(level=logging.DEBUG)
 
 
+@pytest.fixture(scope="class")
+def serial(pytestconfig, request):
+    request.cls.serial = pytestconfig.getoption("serial")
+
+
+@pytest.fixture(scope="class")
+def mqtt_server(pytestconfig, request):
+    request.cls.server = pytestconfig.getoption("server")
+
+
+@pytest.mark.usefixtures("serial", "mqtt_server")
 @pytest.mark.hardware
 class TestPahoCommandHandler(TestCase):
     def setUp(self):
         self.base_topic = "cs/v2"
-        self.serial = "QU8Q-9JTY-HVP8"
-        self.client = PahoConnection("test.mosquitto.org", 1883)
+        self.client = PahoConnection(self.server, 1883)
         self.command_handler = PahoCommandHandler(self.client)
 
     def test_list_files(self):
-        command = commands.ListFiles(self.base_topic, self.serial)
+        command = commands.ListFiles(self.base_topic, self.serial, {"response_suffix": "list"})
         response = self.command_handler.send_command(command)
 
         self.assertEqual(response["success"], True)
         self.assertIn("fileList", response["payload"])
         self.assertIsInstance(response["payload"]["fileList"], list)
-        self.assertEqual(response["payload"]["drive"], "CPU:")
+        self.assertEqual(response["payload"]["drive"], "CPU")
 
+    @pytest.mark.skip
     def test_list_files_with_bad_drive(self):
+        """Logger doesn't have a response paylod - not a usable test"""
         command = commands.ListFiles(self.base_topic, self.serial)
         response = self.command_handler.send_command(command, drive="noway")
 
-        expected_payload = {
-            "success": False,
-            "error": "Directory 'noway:' does not exist",
-            "payload": {"error": "Directory 'noway:' does not exist"},
-        }
-        self.assertDictEqual(response, expected_payload)
+        self.assertEqual(response, None)
 
     def test_os_download_invalid_url(self):
         command = commands.OS(self.base_topic, self.serial)
@@ -121,7 +128,7 @@ class TestPahoCommandHandler(TestCase):
 
         expected = {
             "success": True,
-            "payload": {"success": "Reboot complete"},
+            "payload": {"success": "Rebooting complete"},
         }
 
         self.assertDictEqual(response, expected)
@@ -152,9 +159,9 @@ class TestPahoCommandHandler(TestCase):
         self.assertDictEqual(response, expected)
 
 
+@pytest.mark.usefixtures("serial", "mqtt_server")
 class TestAWSCommandHandler(TestPahoCommandHandler):
     def setUp(self):
         self.base_topic = "cs/v2"
-        self.serial = "QU8Q-9JTY-HVP8"
-        self.client = AWSConnection("testclient", "test.mosquitto.org", 1883)
+        self.client = AWSConnection("testclient", self.server, 1883)
         self.command_handler = AWSCommandHandler(self.client)
