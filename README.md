@@ -128,7 +128,7 @@ pytest
 
 To run the hardware integration tests, you need a Campbell logger configured to allow connection to an MQTT broker on the topic `cs/v2`. Please see the docs for more info about setting up and testing this. The `-m` switch here is the marker for optional hardware tests.
 
-`py.test -vs -m hardware -c ABCDEF`
+`py.test -vs -m hardware -serial ABCDEF`
 
 Options
 
