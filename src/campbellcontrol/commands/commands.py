@@ -61,7 +61,7 @@ class Command(ABC):
         self.state_topic = f"{group_id}/state/{self.device_id}/"
 
         if options and "response_suffix" in options:
-            suffix = options['response_suffix']
+            suffix = options["response_suffix"]
             self.response_topic = f"{self.response_topic}/{suffix}"
 
         self.state_topic = f"{group_id}/state/{self.device_id}/"
