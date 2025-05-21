@@ -45,7 +45,9 @@ class Command(ABC):
         the final response
     """
 
-    def __init__(self, group_id: str, serial: str, model: Optional[str] = "cr1000x") -> None:
+    def __init__(
+        self, group_id: str, serial: str, model: Optional[str] = "cr1000x", options: Optional[dict] = {}
+    ) -> None:
         """Initializes the class. The topics should match that used by the target logger
 
         Args:
@@ -56,6 +58,12 @@ class Command(ABC):
         self.device_id = f"{model}/{serial}"
         self.publish_topic = f"{group_id}/cc/{self.device_id}/{self.command_name}"
         self.response_topic = f"{group_id}/cr/{self.device_id}/{self.command_name}"
+        self.state_topic = f"{group_id}/state/{self.device_id}/"
+
+        if options and "response_suffix" in options:
+            suffix = options['response_suffix']
+            self.response_topic = f"{self.response_topic}/{suffix}"
+
         self.state_topic = f"{group_id}/state/{self.device_id}/"
 
     @abstractmethod
@@ -78,7 +86,6 @@ class Command(ABC):
             topic: The topic that the message is received from.
             message: The received message.
         """
-
         message = json.loads(message)
 
         if "error" in message:
@@ -218,7 +225,6 @@ class ListFiles(Command):
             A command reponse.
         """
         message = json.loads(message)
-
         if "fileList" in message:
             return {
                 "payload": message,
