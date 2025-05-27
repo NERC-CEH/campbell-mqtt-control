@@ -9,6 +9,7 @@ Campbell Logger Commander
 
    self
    mqtt
+   cli
    mqtt-settings
    sources/modules
    genindex
