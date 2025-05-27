@@ -4,10 +4,13 @@ requires = ["setuptools >= 70.0", "autosemver"]
 
 [project]
 requires-python = ">=3.12"
-dependencies = ["autosemver", "awscrt", "paho-mqtt", "setuptools"]
+dependencies = ["autosemver", "awscrt", "paho-mqtt", "setuptools", "click"]
 name = "campbell-control"
 dynamic = ["version"]
 description = "A python package for controlling Campbell dataloggers over MQTT"
+
+[project.scripts]
+mqtt-control = "campbellcontrol.cli:cli"
 
 [project.optional-dependencies]
 test = ["pytest", "pytest-cov", "parameterized"]
