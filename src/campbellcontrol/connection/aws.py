@@ -89,7 +89,13 @@ class AWSConnection(Connection):
             return
         logger.info("Subscription successful. result: {}".format(result))
 
-    def publish(self, topic: str, payload: str | bytes | bytearray, qos: QoS, retain: bool = False) -> None:
+    def publish(
+        self,
+        topic: str,
+        payload: str | bytes | bytearray,
+        qos: QoS,
+        retain: bool = False,
+    ) -> None:
         """Publish a message to a given topic.
 
         Args:
@@ -114,7 +120,10 @@ class AWSConnection(Connection):
 
     @staticmethod
     def _on_connection_resumed(
-        connection: awscrt.mqtt.Connection, return_code: ConnectReturnCode, session_present: bool, **kwargs
+        connection: awscrt.mqtt.Connection,
+        return_code: ConnectReturnCode,
+        session_present: bool,
+        **kwargs,
     ) -> None:
         """Method called when the connection is resumed.
 

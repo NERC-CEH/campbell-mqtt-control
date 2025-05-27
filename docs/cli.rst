@@ -29,16 +29,14 @@ The base `topic` for sending messages and the `broker` client library type will 
     broker: AWS
 
 
-.. code:: javascript
+.. code:: bash
     
-    { 
-        'topic': 'cs/v2',
-        'broker': 'AWS',
-        'serial': 12345,
-        'certificate-pem': 'certificate_filename.pem',
-        'public-key': 'public_filename.key',
-        'private-key': 'private_filename.key'
-    }
+    topic: 'cs/v2'
+    broker: 'AWS'
+    serial: 12345
+    certificate-pem: 'certificate_filename.pem'
+    public-key: 'public_filename.key'
+    private-key: 'private_filename.key'
 
 Settings
 --------

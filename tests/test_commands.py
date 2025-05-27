@@ -352,7 +352,10 @@ class TestHandlers(unittest.TestCase):
     def test_list_files_handler(self):
         """Test the list files handler"""
         payload = b'{"fileList": ["file1", "file2"]}'
-        expected_payload = {"payload": {"fileList": ["file1", "file2"]}, "success": True}
+        expected_payload = {
+            "payload": {"fileList": ["file1", "file2"]},
+            "success": True,
+        }
         self.assertDictEqual(commands.ListFiles.handler("topic", payload), expected_payload)
 
     def test_list_files_handler_error(self):

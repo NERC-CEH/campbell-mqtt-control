@@ -46,7 +46,11 @@ class Command(ABC):
     """
 
     def __init__(
-        self, group_id: str, serial: str, model: Optional[str] = "cr1000x", options: Optional[dict] = {}
+        self,
+        group_id: str,
+        serial: str,
+        model: Optional[str] = "cr1000x",
+        options: Optional[dict] = {},
     ) -> None:
         """Initializes the class. The topics should match that used by the target logger
 
