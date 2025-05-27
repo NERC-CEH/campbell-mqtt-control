@@ -34,9 +34,9 @@ The base `topic` for sending messages and the `broker` client library type will 
     topic: 'cs/v2'
     broker: 'AWS'
     serial: 12345
-    certificate-pem: 'certificate_filename.pem'
-    public-key: 'public_filename.key'
-    private-key: 'private_filename.key'
+    certificate_pem: 'certificate_filename.pem'
+    public_key: 'public_filename.key'
+    private_key: 'private_filename.key'
 
 Settings
 --------
