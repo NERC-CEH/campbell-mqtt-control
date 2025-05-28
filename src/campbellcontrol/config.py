@@ -11,6 +11,8 @@ class Config(TypedDict):
     certificate_pem: str
     public_key: str
     private_key: str
+    server: str
+    port: int
 
 
 def load_config(config_file: Optional[str] = "config.yaml") -> dict:

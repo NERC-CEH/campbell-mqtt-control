@@ -63,7 +63,10 @@ class AWSConnection(Connection):
     def connect(self) -> None:
         """Connect to the MQTT broker."""
         future = self.client.connect()
-        future.result()
+        try:
+            future.result()
+        except AwsCrtError as err:
+            raise ConnectionError(err)
 
     def disconnect(self) -> None:
         """Disconnect from the MQTT broker."""
