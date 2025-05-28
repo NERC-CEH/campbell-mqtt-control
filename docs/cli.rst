@@ -59,10 +59,10 @@ Note: `MQTT settings <https://github.com/NERC-CEH/campbell-mqtt-control/blob/mai
 Scripts
 -------
 
-`mqtt-control list` - show a file listing
+`mqtt-control ls` - show a file listing
 `mqtt-control rm` - delete a file
 
-`mqtt-control download --url=[url] --filename=[filename]` - download the file from `url` and save it at the location `filename`. *"If successful, the program will be set to run now and run on power up and the data logger will restart and compile and run the program"*
+`mqtt-control put --url=[url] --filename=[filename]` - download the file from `url` and save it at the location `filename`. *"If successful, the program will be set to run now and run on power up and the data logger will restart and compile and run the program"*
 
 Script control
 --------------

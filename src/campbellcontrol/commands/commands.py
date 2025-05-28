@@ -74,6 +74,11 @@ class Command(ABC):
     def payload(*args, **kwargs) -> Any:
         """Return the payload used to send the command."""
 
+    def failed_state(self, *args, **kwargs) -> Any:
+        """Return a payload only if it matches specific failure messages.
+        Used for handling responses that are made on the state topic"""
+        pass
+
     def json_payload(self, *args, **kwargs) -> str:
         """Jsonified payload string.
 
@@ -82,9 +87,8 @@ class Command(ABC):
         """
         return json.dumps(self.payload(*args, **kwargs))
 
-    @staticmethod
-    def handler(topic: str, message: str) -> Optional[CommandResponse]:
-        """Handler for messages that always have either a 'success' or 'error' value.
+    def handler(self, topic: str, message: str) -> Optional[CommandResponse]:
+        """Handler for messages that have either a 'success' or 'error' value.
 
         Args:
             topic: The topic that the message is received from.
@@ -100,6 +104,9 @@ class Command(ABC):
             }
         elif "success" in message:
             return {"payload": message, "success": True}
+        # Special case where failure payloads are on the state topic
+        elif self.failed_state(message):
+            return {"payload": message, "success": False}
         else:
             return None
 
@@ -121,6 +128,17 @@ class OS(Command):
 class Program(Command):
     """Command to download a CRBasic Program.
     The downloaded file is set to the current program and reboots the logger.
+
+    If the download fails, the response is sent on `state`, we see two messages:
+
+        {"clientId":"ABC",
+         "state":"online",
+         "fileTransfer":"CRBasic file transfer started"}
+
+        {"clientId":"ABC",
+         "state":"online",
+         "fileTransfer":"CRBasic file transfer error"}
+
     """
 
     command_name = "program"
@@ -136,6 +154,16 @@ class Program(Command):
             A dictionary payload
         """
         return {"url": url, "fileName": filename}
+
+    def failed_state(self, message: dict) -> dict:
+        """Accepts the message on a state topic.
+        If it matches very specific events, return it as a response
+        (Used for handling failures, like file download"""
+
+        # TODO if there are many of these cases, define the strings separately
+        if message.get("fileTransfer", None) == "CRBasic file transfer error":
+            return message
+        return None
 
 
 class MQTTConfig(Command):
