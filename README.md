@@ -1,4 +1,4 @@
-# Python Project Template
+# Campbell MQTT Command and Control
 
 [![tests badge](https://github.com/NERC-CEH/campbell-mqtt-control/actions/workflows/pipeline.yml/badge.svg)](https://github.com/NERC-CEH/campbell-mqtt-control/actions)
 [![docs badge](https://img.shields.io/badge/Documentation-blue)](https://nerc-ceh.github.io/campbell-mqtt-control/)
