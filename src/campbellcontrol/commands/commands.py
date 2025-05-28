@@ -162,6 +162,7 @@ class Program(Command):
 
         # TODO if there are many of these cases, define the strings separately
         if message.get("fileTransfer", None) == "CRBasic file transfer error":
+            message["error"] = "Program download failed"
             return message
         return None
 
