@@ -159,8 +159,8 @@ class Program(Command):
 
     def handle_state(self, message: dict) -> dict:
         """Accepts the message on a state topic.
-        If it matches very specific events, return it as a response
-        (Used for handling failures, like file download"""
+        If it matches specific message strings, return it as a response
+        """
 
         # TODO if there are many of these cases, define the strings separately
         status = message.get("fileTransfer", None)
@@ -299,6 +299,24 @@ class DeleteFile(Command):
         if drive:
             output.update({"drive": drive})
         return output
+
+    def handle_state(self, message: dict) -> dict:
+        """Accepts the message on a state topic.
+        If it matches specific message strings, return it as a response
+        """
+
+        status = message.get("fileTransfer", None)
+
+        if status == "File Does Not Exist":
+            message["error"] = "File could not be found to delete it"
+            message["success"] = False
+        elif status == "File Has Been Deleted":
+            message["success"] = "File successfully deleted!"
+
+        if "success" in message:
+            return message
+
+        return None
 
 
 class StopProgram(Command):

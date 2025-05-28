@@ -41,12 +41,12 @@ def ls(ctx: CommandContext) -> None:
     try:
         response = ctx.command_handler.send_command(command)
     except ConnectionError as err:
-        click.echo(f"Could not connect to {ctx.server}")
+        click.echo(f"Sorry, couldn't connect to {ctx.server}")
         click.echo(err)
         return
 
     if response is None:
-        click.echo(f"Sorry, I couldn't connect to {ctx.serial}")
+        click.echo(f"Sorry, couldn't reach {ctx.serial} on {ctx.server}")
         return
 
     if response["success"]:
@@ -64,16 +64,39 @@ def put(ctx: CommandContext, url: str, filename: str) -> None:
 
     if not filename and url:
         click.echo("Please suggest a URL to download the script from and a filename for it")
+        return
 
     # TODO question about pre-signed URLs / token authentication
     try:
         response = ctx.command_handler.send_command(command, url, filename)
     except ConnectionError as err:
-        click.echo(f"Could not connect to {ctx.server}")
+        click.echo(f"Sorry, couldn't connect to {ctx.server}")
         click.echo(err)
         return
 
     if response["success"] is False:
-        click.echo(f"Failed to upload {url} as {filename}")
+        click.echo(f"Couldn't upload {url} as {filename}")
+
+    click.echo(response)
+
+
+@cli.command()
+@click.option("--filename")
+@click.pass_obj
+def rm(ctx: CommandContext, filename: str) -> None:
+    command = commands.DeleteFile(ctx.topic, ctx.serial)
+    if not filename:
+        click.echo("Please suggest the name of a file you want deleting")
+        return
+
+    try:
+        response = ctx.command_handler.send_command(command, filename)
+    except ConnectionError as err:
+        click.echo(f"Sorry, couldn't connect to {ctx.server}")
+        click.echo(err)
+        return
+
+    if response["success"] is False:
+        click.echo(f"Couldn't delete {filename}")
 
     click.echo(response)
