@@ -38,8 +38,22 @@ The base `topic` for sending messages and the `broker` client library type will 
     public_key: 'public_filename.key'
     private_key: 'private_filename.key'
 
-Settings
---------
+
+Options
+-------
+
+Some options in the configuration file can be over-written by command-line switches.
+
+For example:
+
+`mqtt-control --serial 54321 ls`
+
+Will replace the serial number in the configuration file.
+
+Note that these are options to `mqtt-control` and not to its sub-commands!
+
+Settings (not yet implemented)
+------------------------------
 
 All the settings visible through the "Device Configuration Utility" can be read or changed one by one with the `settings` topic.
 *Note: need to infer a canonical list of names for use in the `set` topic, the `Campbell docs <https://help.campbellsci.com/CR300/Content/shared/Communication/mqtt/mqtt-command-control.htm>`_* don't spell them out.
@@ -60,12 +74,13 @@ Scripts
 -------
 
 `mqtt-control ls` - show a file listing
-`mqtt-control rm` - delete a file
+
+`mqtt-control rm --filename [file]` - delete a file
 
 `mqtt-control put --url=[url] --filename=[filename]` - download the file from `url` and save it at the location `filename`. *"If successful, the program will be set to run now and run on power up and the data logger will restart and compile and run the program"*
 
-Script control
---------------
+Script control (not yet implemented)
+------------------------------------
 
 Optional extras, but nice if quick to implement:
 
@@ -78,5 +93,5 @@ Optional extras, but nice if quick to implement:
 TODO
 ----
 
-* x.509 certificate rotation, if possible (not clear from the API docs whether it is)
+* x.509 certificate rotation, if possible (the `fileControl` interface could be used in an unintended way, but would result in a short downtime while the logger is not running a program)
 
