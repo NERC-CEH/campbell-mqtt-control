@@ -67,7 +67,7 @@ def put(ctx: CommandContext, url: str, filename: str) -> None:
 
     # TODO question about pre-signed URLs / token authentication
     try:
-        response = ctx.command_handler.send_command(command, url, "file")
+        response = ctx.command_handler.send_command(command, url, filename)
     except ConnectionError as err:
         click.echo(f"Could not connect to {ctx.server}")
         click.echo(err)
@@ -75,4 +75,5 @@ def put(ctx: CommandContext, url: str, filename: str) -> None:
 
     if response["success"] is False:
         click.echo(f"Failed to upload {url} as {filename}")
-        click.echo(response)
+
+    click.echo(response)

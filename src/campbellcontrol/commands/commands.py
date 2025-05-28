@@ -74,8 +74,8 @@ class Command(ABC):
     def payload(*args, **kwargs) -> Any:
         """Return the payload used to send the command."""
 
-    def failed_state(self, *args, **kwargs) -> Any:
-        """Return a payload only if it matches specific failure messages.
+    def handle_state(self, *args, **kwargs) -> Any:
+        """Return a payload only if it matches specific messages.
         Used for handling responses that are made on the state topic"""
         pass
 
@@ -95,7 +95,9 @@ class Command(ABC):
             message: The received message.
         """
         message = json.loads(message)
+        state = self.handle_state(message)
 
+        # Case where the responses payloads are on the response topic
         if "error" in message:
             return {
                 "payload": message,
@@ -104,9 +106,9 @@ class Command(ABC):
             }
         elif "success" in message:
             return {"payload": message, "success": True}
-        # Special case where failure payloads are on the state topic
-        elif self.failed_state(message):
-            return {"payload": message, "success": False}
+        # Special cases where response payloads are on the state topic
+        elif state is not None:
+            return {"payload": state, "success": state.get("success", False)}
         else:
             return None
 
@@ -155,15 +157,23 @@ class Program(Command):
         """
         return {"url": url, "fileName": filename}
 
-    def failed_state(self, message: dict) -> dict:
+    def handle_state(self, message: dict) -> dict:
         """Accepts the message on a state topic.
         If it matches very specific events, return it as a response
         (Used for handling failures, like file download"""
 
         # TODO if there are many of these cases, define the strings separately
-        if message.get("fileTransfer", None) == "CRBasic file transfer error":
+        status = message.get("fileTransfer", None)
+
+        if status == "CRBasic file transfer error":
             message["error"] = "Program download failed"
+            message["success"] = False
+        elif status == "Loading CRBasic file":
+            message["success"] = "Program loaded successfully"
+
+        if "success" in message:
             return message
+
         return None
 
 

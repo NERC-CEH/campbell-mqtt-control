@@ -322,6 +322,13 @@ class TestMQTTCommands(unittest.TestCase):
         )
 
 
+class TestCommand(commands.Command):
+    command_name = "test"
+
+    def payload(self):
+        return {"default": "payload"}
+
+
 class TestHandlers(unittest.TestCase):
     def setUp(self) -> None:
         self.group_id = "loggers/cr6"
@@ -331,7 +338,8 @@ class TestHandlers(unittest.TestCase):
         """Test the base handler payload"""
         payload = b'{"success": "Did a thing"}'
         expected_payload = {"payload": {"success": "Did a thing"}, "success": True}
-        self.assertDictEqual(commands.Command.handler("topic", payload), expected_payload)
+        command = TestCommand("a", "b")
+        self.assertDictEqual(command.handler("topic", payload), expected_payload)
 
     def test_base_handler_error(self):
         """Test the base handler payload"""
@@ -341,13 +349,15 @@ class TestHandlers(unittest.TestCase):
             "success": False,
             "error": "Did the wrong thing",
         }
-        self.assertDictEqual(commands.Command.handler("topic", payload), expected_payload)
+        command = TestCommand("a", "b")
+        self.assertDictEqual(command.handler("topic", payload), expected_payload)
 
     def test_unexpected_payload(self):
         """Test when an unexpected payload is received"""
         payload = b'{"unexpected": "Did something"}'
         expected = None
-        self.assertEqual(commands.Command.handler("topic", payload), expected)
+        command = TestCommand("a", "b")
+        self.assertEqual(command.handler("topic", payload), expected)
 
     def test_list_files_handler(self):
         """Test the list files handler"""

@@ -77,7 +77,6 @@ class TestPahoCommandHandler(TestCase):
 
         expected = {
             "success": False,
-            "error": "Program download failed",
             "payload": {"error": "Program download failed"},
         }
 
