@@ -14,8 +14,9 @@ class CommandContext:
         # TODO - factory for loading the right broker, assume AWS now
         # https://github.com/NERC-CEH/campbell-mqtt-control/issues/14
         # TODO improved error handling
+
         self.client = AWSConnection(
-            "cliclient",
+            str(config["serial"]),
             config["server"],
             config["port"],
             private_key=config["private_key"],
@@ -107,3 +108,14 @@ def rm(ctx: CommandContext, filename: str) -> None:
         click.echo(f"Couldn't delete {filename}")
 
     click.echo(response)
+
+
+@cli.command()
+@click.option("--topic")
+@click.pass_obj
+def listen(ctx: CommandContext, topic: str) -> None:
+    ctx.client.connect()
+    print(f"{topic}/#")
+    ctx.client.subscribe(f"{topic}/#")
+
+    ctx.client.client.loop_forever()

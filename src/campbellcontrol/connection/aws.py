@@ -53,6 +53,11 @@ class AWSConnection(Connection):
                 key=kwargs["private_key"],
                 root_ca=kwargs.get("certificate_root", "CARoot.pem"),
             )
+
+            del kwargs["public_key"]
+            del kwargs["private_key"]
+            del kwargs["certificate_root"]
+
         client = Client(client_bootstrap, tls_context)
         connection = awscrt.mqtt.Connection(
             client,
@@ -91,11 +96,11 @@ class AWSConnection(Connection):
         tls_options = io.TlsContextOptions.create_client_with_mtls_from_path(cert, key)
         if root_ca:
             try:
-                with open(root_ca, mode="rb") as ca:
-                    rootca = ca.read()
-                tls_options.override_default_trust_store(rootca)
+                tls_options.override_default_trust_store_from_path(ca_filepath=root_ca)
             except FileNotFoundError:
                 logging.warning("No root CA found")
+            except Exception as err:
+                logging.error(err)
 
         tls_context = io.ClientTlsContext(tls_options)
         return tls_context
