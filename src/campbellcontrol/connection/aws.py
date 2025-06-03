@@ -46,10 +46,10 @@ class AWSConnection(Connection):
         client = Client()
         connection = awscrt.mqtt.Connection(
             client,
-            self.endpoint,
-            self.port,
-            self.client_id,
             *args,
+            host_name=self.endpoint,
+            port=self.port,
+            client_id=self.client_id,
             on_connection_interrupted=self._on_connection_interrupted,
             on_connection_resumed=self._on_connection_resumed,
             on_connection_success=self._on_connection_success,
