@@ -135,6 +135,9 @@ class PahoCommandHandler(CommandHandler):
         # Subscribing to response topic
         self.client.subscribe(command.response_topic)
 
+        # Subscribing to state topic
+        self.client.subscribe(command.state_topic)
+
         # Starting listening behaviour
         self.client.client.loop_start()
 
@@ -162,6 +165,8 @@ class AWSCommandHandler(CommandHandler):
             payload: Payload to send.
         """
         self.client.subscribe(command.response_topic, qos=QoS.EXACTLY_ONCE, callback=self.handle_response)
+        self.client.subscribe(command.state_topic, qos=QoS.EXACTLY_ONCE, callback=self.handle_response)
+
         self.client.publish(command.publish_topic, payload, QoS.AT_LEAST_ONCE)
 
     def _terminate_send(self, command: Command) -> None:

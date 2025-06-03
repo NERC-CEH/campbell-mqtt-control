@@ -3,6 +3,7 @@ from campbellcontrol.control import PahoCommandHandler, AWSCommandHandler
 from campbellcontrol.connection.generic import PahoConnection
 from campbellcontrol.connection.aws import AWSConnection
 import campbellcontrol.commands.commands as commands
+import time
 import logging
 import pytest
 
@@ -77,7 +78,6 @@ class TestPahoCommandHandler(TestCase):
 
         expected = {
             "success": False,
-            "error": "Program download failed",
             "payload": {"error": "Program download failed"},
         }
 
@@ -94,6 +94,18 @@ class TestPahoCommandHandler(TestCase):
         }
 
         self.assertDictEqual(response, expected)
+
+    def test_program_delete(self):
+        command = commands.Program(self.base_topic, self.serial)
+        url = "https://google.com"
+        _ = self.command_handler.send_command(command, url, "test_file")
+        # Give it a wee while to download and reboot - 6 wasn't enough
+        time.sleep(10)
+
+        command = commands.DeleteFile(self.base_topic, self.serial)
+        response = self.command_handler.send_command(command, "test_file")
+
+        self.assertEqual(response["success"], True)
 
     def test_mqttconfig_download_invalid_url(self):
         command = commands.MQTTConfig(self.base_topic, self.serial)

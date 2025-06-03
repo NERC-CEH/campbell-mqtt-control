@@ -46,7 +46,11 @@ class Command(ABC):
     """
 
     def __init__(
-        self, group_id: str, serial: str, model: Optional[str] = "cr1000x", options: Optional[dict] = {}
+        self,
+        group_id: str,
+        serial: str,
+        model: Optional[str] = "cr1000x",
+        options: Optional[dict] = {},
     ) -> None:
         """Initializes the class. The topics should match that used by the target logger
 
@@ -70,6 +74,11 @@ class Command(ABC):
     def payload(*args, **kwargs) -> Any:
         """Return the payload used to send the command."""
 
+    def handle_state(self, *args, **kwargs) -> Any:
+        """Return a payload only if it matches specific messages.
+        Used for handling responses that are made on the state topic"""
+        pass
+
     def json_payload(self, *args, **kwargs) -> str:
         """Jsonified payload string.
 
@@ -78,16 +87,17 @@ class Command(ABC):
         """
         return json.dumps(self.payload(*args, **kwargs))
 
-    @staticmethod
-    def handler(topic: str, message: str) -> Optional[CommandResponse]:
-        """Handler for messages that always have either a 'success' or 'error' value.
+    def handler(self, topic: str, message: str) -> Optional[CommandResponse]:
+        """Handler for messages that have either a 'success' or 'error' value.
 
         Args:
             topic: The topic that the message is received from.
             message: The received message.
         """
         message = json.loads(message)
+        state = self.handle_state(message)
 
+        # Case where the responses payloads are on the response topic
         if "error" in message:
             return {
                 "payload": message,
@@ -96,6 +106,9 @@ class Command(ABC):
             }
         elif "success" in message:
             return {"payload": message, "success": True}
+        # Special cases where response payloads are on the state topic
+        elif state is not None:
+            return {"payload": state, "success": state.get("success", False)}
         else:
             return None
 
@@ -117,6 +130,17 @@ class OS(Command):
 class Program(Command):
     """Command to download a CRBasic Program.
     The downloaded file is set to the current program and reboots the logger.
+
+    If the download fails, the response is sent on `state`, we see two messages:
+
+        {"clientId":"ABC",
+         "state":"online",
+         "fileTransfer":"CRBasic file transfer started"}
+
+        {"clientId":"ABC",
+         "state":"online",
+         "fileTransfer":"CRBasic file transfer error"}
+
     """
 
     command_name = "program"
@@ -132,6 +156,25 @@ class Program(Command):
             A dictionary payload
         """
         return {"url": url, "fileName": filename}
+
+    def handle_state(self, message: dict) -> dict:
+        """Accepts the message on a state topic.
+        If it matches specific message strings, return it as a response
+        """
+
+        # TODO if there are many of these cases, define the strings separately
+        status = message.get("fileTransfer", None)
+
+        if status == "CRBasic file transfer error":
+            message["error"] = "Program download failed"
+            message["success"] = False
+        elif status == "Loading CRBasic file":
+            message["success"] = "Program loaded successfully"
+
+        if "success" in message:
+            return message
+
+        return None
 
 
 class MQTTConfig(Command):
@@ -256,6 +299,24 @@ class DeleteFile(Command):
         if drive:
             output.update({"drive": drive})
         return output
+
+    def handle_state(self, message: dict) -> dict:
+        """Accepts the message on a state topic.
+        If it matches specific message strings, return it as a response
+        """
+
+        status = message.get("fileTransfer", None)
+
+        if status == "File Does Not Exist":
+            message["error"] = "File could not be found to delete it"
+            message["success"] = False
+        elif status == "File Has Been Deleted":
+            message["success"] = "File successfully deleted!"
+
+        if "success" in message:
+            return message
+
+        return None
 
 
 class StopProgram(Command):
