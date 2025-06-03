@@ -14,7 +14,14 @@ class CommandContext:
         # TODO - factory for loading the right broker, assume AWS now
         # https://github.com/NERC-CEH/campbell-mqtt-control/issues/14
         # TODO improved error handling
-        self.client = AWSConnection("cliclient", config["server"], config["port"])
+        self.client = AWSConnection(
+            "cliclient",
+            config["server"],
+            config["port"],
+            private_key=config["private_key"],
+            public_key=config["public_key"],
+            certificate_root=config["certificate_root"],
+        )
         self.command_handler = AWSCommandHandler(self.client)
 
         for key, value in config.items():

@@ -8,7 +8,7 @@ class Config(TypedDict):
     serial: int
     topic: str
     broker: str
-    certificate_pem: str
+    certificate_root: str
     public_key: str
     private_key: str
     server: str
