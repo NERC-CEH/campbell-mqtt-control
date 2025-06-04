@@ -65,7 +65,7 @@ def ls(ctx: CommandContext) -> None:
 @click.option("--filename")
 @click.pass_obj
 def put(ctx: CommandContext, url: str, filename: str) -> None:
-    """Upload a file at URL onto the location filename"""
+    """Upload a file at {URL} to a file named {filename} on the logger"""
     command = commands.Program(ctx.topic, ctx.client_id)
 
     if not filename and url:
@@ -113,14 +113,15 @@ def rm(ctx: CommandContext, filename: str) -> None:
 @click.argument("setting")
 @click.pass_obj
 def get(ctx: CommandContext, setting: str) -> None:
-    """Get the value of a named setting
-    TODO add either a command or a help message that returns all names
+    """Get the value of a setting on the logger.
+
+    To see a list of all settings, type "mqtt-control settings"
     """
     return get_setting(ctx, setting)
 
 
 def get_setting(ctx: CommandContext, setting: str) -> None:
-    """Read the value of a setting"""
+    """Show an existing setting on the logger"""
     command = commands.PublishSetting(ctx.topic, ctx.client_id)
     try:
         response = ctx.command_handler.send_command(command, setting)
@@ -136,10 +137,27 @@ def get_setting(ctx: CommandContext, setting: str) -> None:
 
 
 @cli.command()
+def settings() -> str:
+    """
+    Shows all the settings which you can reset with this tool.
+
+    For reference see the official documentation at
+    https://help.campbellsci.com/CR1000X/Content/shared/Maintain/Advanced/settings-general.htm
+
+    """
+    with open("settings.txt", "r") as out:
+        settings_list = out.read()
+
+    click.echo(settings_list)
+    click.echo("https://help.campbellsci.com/CR1000X/Content/shared/Maintain/Advanced/settings-general.htm")
+
+
+@cli.command()
 @click.argument("setting")
 @click.argument("value")
 @click.pass_obj
 def set(ctx: CommandContext, setting: str, value: Union[int, str, float]) -> None:  # noqa: A001
+    """Update a setting on the logger"""
     command = commands.SetSetting(ctx.topic, ctx.client_id)
     try:
         response = ctx.command_handler.send_command(command, setting, value)
