@@ -183,20 +183,26 @@ class TestPahoCommandHandler(TestCase):
 
     def test_set_setting(self):
         setting = "PakBusAddress"
+        command = commands.SetSetting(self.topic, self.client_id)
+        get_command = commands.PublishSetting(self.base_topic, self.client_id)
+
         # Re-run a couple of times in case we're setting a current value
         for value in range(1, 3):
-            command = commands.SetSetting(self.topic, self.client_id)
             response = self.command_handler.send_command(command, setting, str(value))
-            command = commands.PublishSetting(self.base_topic, self.client_id)
-            response = self.command_handler.send_command(command, setting)
+            assert response["success"]
+            response = self.command_handler.send_command(get_command, setting)
             assert str(response["payload"].get("value").strip()) == str(value)
+
+        # Note that it fails unless we are explicitly casting to string type
+        # Yes, this is a numeric setting in theory
+        response = self.command_handler.send_command(command, setting, value)
+        assert not response
 
         # Note that setting an impossible value still yields a success response
         value = "hello"
-        command = commands.SetSetting(self.topic, self.client_id)
         response = self.command_handler.send_command(command, setting, value)
-        command = commands.PublishSetting(self.base_topic, self.client_id)
-        response = self.command_handler.send_command(command, setting)
+        assert response["success"]  # oh really
+        response = self.command_handler.send_command(get_command, setting)
         with pytest.raises(AssertionError) as err:
             assert str(response["payload"].get("value").strip()) == str(value)
 
