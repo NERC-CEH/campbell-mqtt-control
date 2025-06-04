@@ -5,7 +5,7 @@ Submodules
 ----------
 
 campbellcontrol.mqttconfig.builder module
--------------------------
+-----------------------------------------
 
 .. automodule:: campbellcontrol.mqttconfig.builder
    :members:
