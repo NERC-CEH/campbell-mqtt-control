@@ -54,9 +54,9 @@ class AWSConnection(Connection):
                 root_ca=kwargs.get("certificate_root", "CARoot.pem"),
             )
 
-            del kwargs["public_key"]
-            del kwargs["private_key"]
-            del kwargs["certificate_root"]
+        del kwargs["public_key"]
+        del kwargs["private_key"]
+        del kwargs["certificate_root"]
 
         client = Client(client_bootstrap, tls_context)
         connection = awscrt.mqtt.Connection(
