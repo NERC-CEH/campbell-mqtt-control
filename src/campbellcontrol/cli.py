@@ -23,12 +23,12 @@ class CommandContext:
 
 @click.group(context_settings={"auto_envvar_prefix": "MQTT"})  # this allows for environment variables
 @click.option("--config", default="config.yaml", type=click.Path())
-@click.option("--serial", type=int)
+@click.option("--client_id", type=int)
 @click.pass_context
-def cli(ctx: click.Context, config: str, serial: int) -> None:
+def cli(ctx: click.Context, config: str, client_id: int) -> None:
     options = load_config(config)
-    if serial:
-        options["serial"] = serial
+    if client_id:
+        options["client_id"] = client_id
     ctx.obj = CommandContext(options)
 
 
@@ -36,7 +36,7 @@ def cli(ctx: click.Context, config: str, serial: int) -> None:
 @click.pass_obj
 def ls(ctx: CommandContext) -> None:
     """Read and print the list of files on the logger"""
-    command = commands.ListFiles(ctx.topic, ctx.serial, options={"response_suffix": "list"})
+    command = commands.ListFiles(ctx.topic, ctx.client_id, options={"response_suffix": "list"})
 
     try:
         response = ctx.command_handler.send_command(command)
@@ -46,11 +46,11 @@ def ls(ctx: CommandContext) -> None:
         return
 
     if response is None:
-        click.echo(f"Sorry, couldn't reach {ctx.serial} on {ctx.server}")
+        click.echo(f"Sorry, couldn't reach {ctx.client_id} on {ctx.server}")
         return
 
     if response["success"]:
-        click.echo(f"Files on device {ctx.serial}")
+        click.echo(f"Files on device {ctx.client_id}")
         for f in response["payload"]["fileList"]:
             click.echo(f)
 
@@ -60,7 +60,8 @@ def ls(ctx: CommandContext) -> None:
 @click.option("--filename")
 @click.pass_obj
 def put(ctx: CommandContext, url: str, filename: str) -> None:
-    command = commands.Program(ctx.topic, ctx.serial)
+    """Upload a file at URL onto the location filename"""
+    command = commands.Program(ctx.topic, ctx.client_id)
 
     if not filename and url:
         click.echo("Please suggest a URL to download the script from and a filename for it")
@@ -84,7 +85,8 @@ def put(ctx: CommandContext, url: str, filename: str) -> None:
 @click.option("--filename")
 @click.pass_obj
 def rm(ctx: CommandContext, filename: str) -> None:
-    command = commands.DeleteFile(ctx.topic, ctx.serial)
+    """Delete a named file off the datalogger"""
+    command = commands.DeleteFile(ctx.topic, ctx.client_id)
     if not filename:
         click.echo("Please suggest the name of a file you want deleting")
         return
@@ -100,3 +102,21 @@ def rm(ctx: CommandContext, filename: str) -> None:
         click.echo(f"Couldn't delete {filename}")
 
     click.echo(response)
+
+
+@cli.command()
+@click.argument("setting")
+@click.pass_obj
+def get(ctx: CommandContext, setting: str) -> None:
+    """Get the value of a named setting
+    TODO add either a command or a help message that returns all names
+    """
+    command = commands.PublishSetting(ctx.topic, ctx.client_id)
+    try:
+        response = ctx.command_handler.send_command(command, setting)
+    except ConnectionError as err:
+        click.echo(f"Sorry, couldn't connect to {ctx.server}")
+        click.echo(err)
+        return
+
+    print(response)
