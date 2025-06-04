@@ -1,9 +1,14 @@
+import logging
+from typing import Union
+
 import click
 
 import campbellcontrol.commands.commands as commands
 from campbellcontrol.config import load_config
 from campbellcontrol.connection.aws import AWSConnection
 from campbellcontrol.control import AWSCommandHandler
+
+logging.basicConfig(level=logging.WARNING)
 
 
 class CommandContext:
@@ -111,6 +116,11 @@ def get(ctx: CommandContext, setting: str) -> None:
     """Get the value of a named setting
     TODO add either a command or a help message that returns all names
     """
+    return get_setting(ctx, setting)
+
+
+def get_setting(ctx: CommandContext, setting: str) -> None:
+    """Read the value of a setting"""
     command = commands.PublishSetting(ctx.topic, ctx.client_id)
     try:
         response = ctx.command_handler.send_command(command, setting)
@@ -118,5 +128,38 @@ def get(ctx: CommandContext, setting: str) -> None:
         click.echo(f"Sorry, couldn't connect to {ctx.server}")
         click.echo(err)
         return
+    setting = response["payload"].get("value", None)
+    if setting:
+        # It comes back padded. We may wish to infer a type or use a mapping
+        setting = setting.strip()
+    return setting
 
-    print(response)
+
+@cli.command()
+@click.argument("setting")
+@click.argument("value")
+@click.pass_obj
+def set(ctx: CommandContext, setting: str, value: Union[int, str, float]) -> None:  # noqa: A001
+    command = commands.SetSetting(ctx.topic, ctx.client_id)
+    try:
+        response = ctx.command_handler.send_command(command, setting, value)
+    except ConnectionError as err:
+        click.echo(f"Sorry, couldn't connect to {ctx.server}")
+        click.echo(err)
+        return
+
+    # Note - you can set values in a range the logger doesn't accept
+    # (For example, setting the PakBusAddress to "hello")
+    # And it will still return a success response
+    # So we should issue a Get to check the value. It comes left padded with spaces
+
+    message = f"Sorry, couldn't set the {setting} to {value}"
+    if response["success"]:
+        new_value = get_setting(ctx, setting)
+        try:
+            assert str(new_value) == str(value)
+            message = f"Happily set the {setting} to {value}!"
+        except AssertionError as err:
+            logging.warning(err)
+
+    click.echo(message)

@@ -371,6 +371,20 @@ class SetSetting(Command):
             output.update({"apply": apply})
         return output
 
+    def handler(self, topic: str, message: str) -> Optional[CommandResponse]:
+        """Handler for messages in response to setting a setting
+
+        Args:
+            topic: The topic that the message is received from.
+            message: The received message.
+        """
+        response = {"success": False}
+        message = json.loads(message)
+        if "state" in message and message["state"] == "Set Setting Succeeded":
+            response["success"] = True
+            response["payload"] = message
+        return response
+
 
 class ApplySettings(Command):
     """Apply changed logger settings"""
