@@ -4,10 +4,10 @@ mqttconfig package
 Submodules
 ----------
 
-mqttconfig.builder module
+campbellcontrol.mqttconfig.builder module
 -------------------------
 
-.. automodule:: mqttconfig.builder
+.. automodule:: campbellcontrol.mqttconfig.builder
    :members:
    :show-inheritance:
    :undoc-members:
@@ -15,7 +15,7 @@ mqttconfig.builder module
 Module contents
 ---------------
 
-.. automodule:: mqttconfig
+.. automodule:: campbellcontrol.mqttconfig
    :members:
    :show-inheritance:
    :undoc-members:
