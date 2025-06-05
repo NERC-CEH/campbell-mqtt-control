@@ -5,7 +5,7 @@ import yaml
 
 
 class Config(TypedDict):
-    serial: int
+    client_id: str
     topic: str
     broker: str
     certificate_root: str

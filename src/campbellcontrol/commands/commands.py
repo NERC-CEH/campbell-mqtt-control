@@ -48,7 +48,7 @@ class Command(ABC):
     def __init__(
         self,
         group_id: str,
-        serial: str,
+        client_id: str,
         model: Optional[str] = "cr1000x",
         options: Optional[dict] = {},
     ) -> None:
@@ -56,10 +56,10 @@ class Command(ABC):
 
         Args:
             group_id: The base topic used by the logger.
-            serial: The serial number of the target logger
+            client_id: The client identifier (often the serial number) of the target logger
             model: optional, default 'cr1000x' - the model number of the logger
         """
-        self.device_id = f"{model}/{serial}"
+        self.device_id = f"{model}/{client_id}"
         self.publish_topic = f"{group_id}/cc/{self.device_id}/{self.command_name}"
         self.response_topic = f"{group_id}/cr/{self.device_id}/{self.command_name}"
         self.state_topic = f"{group_id}/state/{self.device_id}/"
@@ -371,6 +371,20 @@ class SetSetting(Command):
             output.update({"apply": apply})
         return output
 
+    def handler(self, topic: str, message: str) -> Optional[CommandResponse]:
+        """Handler for messages in response to setting a setting
+
+        Args:
+            topic: The topic that the message is received from.
+            message: The received message.
+        """
+        response = {"success": False}
+        message = json.loads(message)
+        if "state" in message and message["state"] == "Set Setting Succeeded":
+            response["success"] = True
+            response["payload"] = message
+        return response
+
 
 class ApplySettings(Command):
     """Apply changed logger settings"""
@@ -400,6 +414,23 @@ class PublishSetting(Command):
             A dictionary payload.
         """
         return {"action": "publish", "name": name}
+
+    def handler(self, topic: str, message: str) -> Optional[CommandResponse]:
+        """Handler for messages in response to setting,
+        action is just to pass the response straight through
+
+        Args:
+            topic: The topic that the message is received from.
+            message: The received message.
+
+
+        """
+        response = {"success": False}
+        message = json.loads(message)
+        if "setting" in message:
+            response["success"] = True
+            response["payload"] = message
+        return response
 
 
 class SetVar(Command):

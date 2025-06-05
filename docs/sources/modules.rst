@@ -5,4 +5,3 @@ Code Reference
    :maxdepth: 4
 
    campbellcontrol
-   mqttconfig

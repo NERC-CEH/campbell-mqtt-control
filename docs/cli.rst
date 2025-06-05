@@ -33,9 +33,9 @@ The base `topic` for sending messages and the `broker` client library type will 
     
     topic: 'cs/v2'
     broker: 'AWS'
-    serial: 12345
+    client_id: 12345
     certificate_pem: 'certificate_filename.pem'
-    public_key: 'public_filename.key'
+    public_key: 'public_filename.crt'
     private_key: 'private_filename.key'
 
 
@@ -46,29 +46,47 @@ Some options in the configuration file can be over-written by command-line switc
 
 For example:
 
-`mqtt-control --serial 54321 ls`
+`mqtt-control --client_id 54321 ls`
 
-Will replace the serial number in the configuration file.
+Will replace the client ID number set in the configuration file.
 
 Note that these are options to `mqtt-control` and not to its sub-commands!
 
-Settings (not yet implemented)
-------------------------------
+Settings
+--------
 
 All the settings visible through the "Device Configuration Utility" can be read or changed one by one with the `settings` topic.
-*Note: need to infer a canonical list of names for use in the `set` topic, the `Campbell docs <https://help.campbellsci.com/CR300/Content/shared/Communication/mqtt/mqtt-command-control.htm>`_* don't spell them out.
+
+There's a [full list of settings in the official documentation](https://help.campbellsci.com/CR1000X/Content/shared/Maintain/Advanced/settings-general.htm). There's also a script, `extract_settings.py` included in the repository, which collects the list from that page into a text file.
+
+Get the value of a specific setting on the logger. 
 
 `mqtt-control get [setting]`
 
-Get the value of a specific setting on the logger.
+For example,
 
-`mqtt-control get --help`
+`mqtt-control get PakBusAddress`
 
-See a list of all the settings available to get or set 
+Set a given setting to a specific value:
 
-Note: `MQTT settings <https://github.com/NERC-CEH/campbell-mqtt-control/blob/main/src/mqttconfig/README.md>`_ binary format specifically for configuring the MQTT settings all at once.
+`mqtt-control set [setting] [value]`
 
-`mqtt-control set [setting]`
+For example,
+
+`mqtt-control set PakBusAddress 2`
+
+See a list of all the setting names available to get or set:
+
+`mqtt-control settings`
+
+
+MQTT Configuration (not yet implemented)
+----------------------------------------
+
+Send an updated MQTT configuration value to the logger.
+
+`mqtt-control config --name [setting] --value [value]`
+
 
 Scripts
 -------
