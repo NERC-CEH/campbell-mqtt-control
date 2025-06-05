@@ -3,6 +3,6 @@ broker: 'AWS'
 client_id: 12345
 server: localhost
 port: 1883
-certificate_pem: 'certificate_filename.pem'
-public_key: 'public_filename.key'
+certificate_root: 'CARoot.pem'
+public_key: 'public_filename.crt'
 private_key: 'private_filename.key'

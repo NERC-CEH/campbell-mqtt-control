@@ -4,6 +4,7 @@ import logging
 from typing import Callable
 
 import awscrt.mqtt
+from awscrt import io
 from awscrt.exceptions import AwsCrtError
 from awscrt.mqtt import (
     Client,
@@ -43,13 +44,27 @@ class AWSConnection(Connection):
             *args: Additional arguments forwarded to the client.
             **kwargs: Additional keyword arguments forwarded to the client.
         """
-        client = Client()
+        # TODO https://awslabs.github.io/aws-crt-python/api/io.html#awscrt.io.ClientBootstrap
+        client_bootstrap = None
+        tls_context = None
+        if kwargs.get("public_key") and kwargs.get("private_key"):
+            tls_context = self._tls_context(
+                cert=kwargs["public_key"],
+                key=kwargs["private_key"],
+                root_ca=kwargs.get("certificate_root", "CARoot.pem"),
+            )
+
+        del kwargs["public_key"]
+        del kwargs["private_key"]
+        del kwargs["certificate_root"]
+
+        client = Client(client_bootstrap, tls_context)
         connection = awscrt.mqtt.Connection(
             client,
-            self.endpoint,
-            self.port,
-            self.client_id,
             *args,
+            host_name=self.endpoint,
+            port=self.port,
+            client_id=self.client_id,
             on_connection_interrupted=self._on_connection_interrupted,
             on_connection_resumed=self._on_connection_resumed,
             on_connection_success=self._on_connection_success,
@@ -59,6 +74,36 @@ class AWSConnection(Connection):
         )
         connection.on_message(self._on_message)
         return connection
+
+    def _tls_context(
+        self,
+        cert: str,
+        key: str,
+        root_ca: str,
+    ) -> io.ClientTlsContext:
+        """Set up to authenticate with AWS IoT.
+
+        Args:
+            cert: Path to a certificate file
+            key: Path to a .pem format key
+            root_ca: Path to the AWS CARoot.pem file
+
+        This logic is borrowed from the SDK tests:
+        https://github.com/awslabs/aws-crt-python/blob/main/mqtt_test.py#L86
+
+        # TODO Add websockets support, if we (or others) need it
+        """
+        tls_options = io.TlsContextOptions.create_client_with_mtls_from_path(cert, key)
+        if root_ca:
+            try:
+                tls_options.override_default_trust_store_from_path(ca_filepath=root_ca)
+            except FileNotFoundError:
+                logging.warning("No root CA found")
+            except Exception as err:
+                logging.error(err)
+
+        tls_context = io.ClientTlsContext(tls_options)
+        return tls_context
 
     def connect(self) -> None:
         """Connect to the MQTT broker."""
