@@ -62,7 +62,6 @@ class Command(ABC):
         self.device_id = f"{model}/{client_id}"
         self.publish_topic = f"{group_id}/cc/{self.device_id}/{self.command_name}"
         self.response_topic = f"{group_id}/cr/{self.device_id}/{self.command_name}"
-        self.state_topic = f"{group_id}/state/{self.device_id}/"
 
         if options and "response_suffix" in options:
             suffix = options["response_suffix"]
