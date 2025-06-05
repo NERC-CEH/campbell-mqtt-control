@@ -41,7 +41,7 @@ def cli(ctx: click.Context, config: str, client_id: int) -> None:
 @click.pass_obj
 def ls(ctx: CommandContext) -> None:
     """Read and print the list of files on the logger"""
-    command = commands.ListFiles(ctx.topic, ctx.client_id, options={"response_suffix": "list"})
+    command = commands.ListFiles(ctx.topic, ctx.client_id)
 
     try:
         response = ctx.command_handler.send_command(command)
