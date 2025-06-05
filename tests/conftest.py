@@ -17,3 +17,8 @@ def fixture_dir():
 @pytest.fixture
 def config_file(fixture_dir):
     return fixture_dir / "config.yaml"
+
+
+@pytest.fixture
+def mqtt_config_example(fixture_dir):
+    return fixture_dir / "mqtt.bin"
