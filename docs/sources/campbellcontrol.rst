@@ -9,6 +9,7 @@ Subpackages
 
    campbellcontrol.commands
    campbellcontrol.connection
+   campbellcontrol.mqttconfig
 
 Submodules
 ----------
