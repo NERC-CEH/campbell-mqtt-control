@@ -6,7 +6,7 @@ from campbellcontrol.config import load_config
 logging.basicConfig(level=logging.DEBUG)
 
 config = load_config()
-topic = config['topic']
+topic = config.topic
 
 def main(client_id: str, server: str, port: int) -> None:
     logging.info(f"Connecting to {server}")

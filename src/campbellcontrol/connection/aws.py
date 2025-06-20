@@ -37,6 +37,18 @@ class AWSConnection(Connection):
         self.client_id = client_id
         super().__init__(*args, **kwargs)
 
+    def get_client_bootstrap(self) -> io.ClientBootstrap:
+        """
+        "The ClientBootstrap will default to the static default (Io.ClientBootstrap.get_or_create_static_default)"
+        https://awslabs.github.io/aws-crt-python/api/io.html#awscrt.io.ClientBootstrap
+        This example is from the mqtt_test.py util in the aws-crt-python repo.
+        TODO - understand how this works.
+        """
+        event_loop_group = io.EventLoopGroup(1)
+        host_resolver = io.DefaultHostResolver(event_loop_group)
+        client_bootstrap = io.ClientBootstrap(event_loop_group, host_resolver)
+        return client_bootstrap
+
     def get_client(self, *args, **kwargs) -> awscrt.mqtt.Connection:
         """Return the AWS MQTT client instance.
 
@@ -44,8 +56,8 @@ class AWSConnection(Connection):
             *args: Additional arguments forwarded to the client.
             **kwargs: Additional keyword arguments forwarded to the client.
         """
-        # TODO https://awslabs.github.io/aws-crt-python/api/io.html#awscrt.io.ClientBootstrap
-        client_bootstrap = None
+        client_bootstrap = self.get_client_bootstrap()
+
         tls_context = None
         if kwargs.get("public_key") and kwargs.get("private_key"):
             tls_context = self._tls_context(
@@ -128,7 +140,6 @@ class AWSConnection(Connection):
         """
 
         future, _ = self.client.subscribe(topic=topic, qos=qos, callback=callback)
-
         result = future.result()
         exception = future.exception()
 

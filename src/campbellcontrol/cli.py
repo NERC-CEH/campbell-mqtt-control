@@ -1,10 +1,11 @@
+import dataclasses
 import logging
 from typing import Union
 
 import click
 
 import campbellcontrol.commands.commands as commands
-from campbellcontrol.config import load_config, Config
+from campbellcontrol.config import Config, load_config
 from campbellcontrol.connection.aws import AWSConnection
 from campbellcontrol.control import AWSCommandHandler
 
@@ -30,7 +31,7 @@ class CommandContext:
         )
         self.command_handler = AWSCommandHandler(self.client)
 
-        for key, value in config.items():
+        for key, value in dataclasses.asdict(config).items():
             setattr(self, key, value)
 
 

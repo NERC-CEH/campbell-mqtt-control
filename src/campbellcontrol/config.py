@@ -1,11 +1,12 @@
 import logging
 from dataclasses import dataclass
-from typing import Optional, TypedDict
+from typing import Optional
 
 import yaml
 
+
 @dataclass
-class Config():
+class Config:
     client_id: str
     topic: str
     broker: str
