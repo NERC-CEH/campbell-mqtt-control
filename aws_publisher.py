@@ -1,3 +1,4 @@
+import json
 import logging
 
 from awscrt.mqtt import QoS

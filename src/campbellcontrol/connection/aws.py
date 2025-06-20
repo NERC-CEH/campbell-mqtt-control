@@ -44,6 +44,7 @@ class AWSConnection(Connection):
         This example is from the mqtt_test.py util in the aws-crt-python repo.
         TODO - understand how this works.
         """
+        return None
         event_loop_group = io.EventLoopGroup(1)
         host_resolver = io.DefaultHostResolver(event_loop_group)
         client_bootstrap = io.ClientBootstrap(event_loop_group, host_resolver)
