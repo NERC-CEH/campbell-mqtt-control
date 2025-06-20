@@ -241,15 +241,16 @@ class Reboot(Command):
         """Accepts the message on a state topic.
         If it matches specific message strings, return it as a response
         """
-        state = message.get('state',None)
-        reason = message.get('reason')
-        response = {'success': False}
+        state = message.get("state", None)
+        reason = message.get("reason")
+        response = {"success": False}
 
-        if state == 'offline' and 'Reboot' in reason:
-            response['success'] = True
-            response['payload'] = message
+        if state == "offline" and "Reboot" in reason:
+            response["success"] = True
+            response["payload"] = message
 
         return response
+
 
 class ListFiles(Command):
     """Command to list files in a drive."""

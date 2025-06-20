@@ -182,6 +182,7 @@ def set(ctx: CommandContext, setting: str, value: Union[int, str, float]) -> Non
 
     click.echo(message)
 
+
 @cli.command()
 @click.option("--url")
 @click.pass_obj
@@ -196,6 +197,7 @@ def mqttconf(ctx: CommandContext, url: str) -> None:
 
     click.echo(response)
 
+
 @cli.command()
 @click.pass_obj
 def reboot(ctx: CommandContext) -> None:
@@ -209,5 +211,3 @@ def reboot(ctx: CommandContext) -> None:
         return
 
     click.echo(response)
-
-    
