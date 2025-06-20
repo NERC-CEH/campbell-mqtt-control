@@ -1,10 +1,11 @@
 import logging
+from dataclasses import dataclass
 from typing import Optional, TypedDict
 
 import yaml
 
-
-class Config(TypedDict):
+@dataclass
+class Config():
     client_id: str
     topic: str
     broker: str
@@ -23,4 +24,4 @@ def load_config(config_file: Optional[str] = "config.yaml") -> dict:
         logging.warning(f"Configuration file not found at {config_file}")
         # TODO decide whether to exit or assume defaults, for now:
         raise
-    return Config(config)
+    return Config(**config)

@@ -4,7 +4,7 @@ from typing import Union
 import click
 
 import campbellcontrol.commands.commands as commands
-from campbellcontrol.config import load_config
+from campbellcontrol.config import load_config, Config
 from campbellcontrol.connection.aws import AWSConnection
 from campbellcontrol.control import AWSCommandHandler
 
@@ -15,18 +15,18 @@ class CommandContext:
     """Create one context object that holds a CommandHandler
     and the rest of the config as attributes - click may have a better way!"""
 
-    def __init__(self, config: dict):
+    def __init__(self, config: Config):
         # TODO - factory for loading the right broker, assume AWS now
         # https://github.com/NERC-CEH/campbell-mqtt-control/issues/14
         # TODO improved error handling
 
         self.client = AWSConnection(
-            str(config["serial"]),
-            config["server"],
-            config["port"],
-            private_key=config["private_key"],
-            public_key=config["public_key"],
-            certificate_root=config["certificate_root"],
+            str(config.client_id),
+            config.server,
+            config.port,
+            private_key=config.private_key,
+            public_key=config.public_key,
+            certificate_root=config.certificate_root,
         )
         self.command_handler = AWSCommandHandler(self.client)
 
@@ -41,7 +41,7 @@ class CommandContext:
 def cli(ctx: click.Context, config: str, client_id: int) -> None:
     options = load_config(config)
     if client_id:
-        options["client_id"] = client_id
+        options.client_id = client_id
     ctx.obj = CommandContext(options)
 
 
