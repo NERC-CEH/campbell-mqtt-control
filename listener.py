@@ -2,17 +2,19 @@ import argparse
 import logging
 
 from campbellcontrol.connection.generic import PahoConnection
-
+from campbellcontrol.config import load_config
 logging.basicConfig(level=logging.DEBUG)
 
+config = load_config()
+topic = config['topic']
 
 def main(client_id: str, server: str, port: int) -> None:
     logging.info(f"Connecting to {server}")
     conn = PahoConnection(server, 1883)
     conn.connect()
-    conn.subscribe(f"cs/v2/+/{client_id}")
-    conn.subscribe(f"cs/v2/+/{client_id}/#")
-    conn.subscribe("cs/v2/#")
+    conn.subscribe(f"{topic}/+/{client_id}")
+    conn.subscribe(f"{topic}/+/{client_id}/#")
+    conn.subscribe(f"{topic}/#")
 
     conn.client.loop_forever()
 
