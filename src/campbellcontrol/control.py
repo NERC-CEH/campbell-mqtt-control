@@ -1,6 +1,7 @@
 """Module for sending commands and receiving responses from loggers."""
 
 import logging
+import threading
 import time
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
@@ -156,8 +157,6 @@ class PahoCommandHandler(CommandHandler):
 
 class AWSCommandHandler(CommandHandler):
     def __init__(self, client: Connection) -> None:
-        import threading
-
         self.receive_event = threading.Event()
         super().__init__(client)
 
