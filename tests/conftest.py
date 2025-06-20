@@ -21,4 +21,4 @@ def config_file(fixture_dir):
 
 @pytest.fixture
 def mqtt_config_example(fixture_dir):
-    return fixture_dir / "mqtt.bin"
+    return fixture_dir / "mqttCfg.bin"

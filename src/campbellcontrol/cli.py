@@ -181,3 +181,33 @@ def set(ctx: CommandContext, setting: str, value: Union[int, str, float]) -> Non
             logging.warning(err)
 
     click.echo(message)
+
+@cli.command()
+@click.option("--url")
+@click.pass_obj
+def mqttconf(ctx: CommandContext, url: str) -> None:
+    command = commands.MQTTConfig(ctx.topic, ctx.client_id)
+    try:
+        response = ctx.command_handler.send_command(command, url)
+    except ConnectionError as err:
+        click.echo(f"Sorry, couldn't connect to {ctx.server}")
+        click.echo(err)
+        return
+
+    click.echo(response)
+
+@cli.command()
+@click.pass_obj
+def reboot(ctx: CommandContext) -> None:
+    click.confirm(f"Are you sure you want to reboot logger {ctx.client_id}?", abort=True)
+    command = commands.Reboot(ctx.topic, ctx.client_id)
+    try:
+        response = ctx.command_handler.send_command(command)
+    except ConnectionError as err:
+        click.echo(f"Sorry, couldn't connect to {ctx.server}")
+        click.echo(err)
+        return
+
+    click.echo(response)
+
+    
