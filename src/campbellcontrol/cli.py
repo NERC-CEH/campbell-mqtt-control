@@ -200,7 +200,7 @@ def set(ctx: CommandContext, setting: str, value: Union[int, str, float]) -> Non
 @click.pass_obj
 def setvar(ctx: CommandContext, setting: str, value: Union[int, str, float]) -> None:  # noqa: A001
     """Update a script variable on the logger.
-    Useful for adaptive sampling!"""
+    Hopefully useful for adaptive sampling!"""
     command = commands.SetVar(ctx.topic, ctx.client_id)
     try:
         response = ctx.command_handler.send_command(command, setting, value)
@@ -209,7 +209,37 @@ def setvar(ctx: CommandContext, setting: str, value: Union[int, str, float]) -> 
         click.echo(err)
         return
 
-    click.echo(response)
+    if response["success"]:
+        click.echo(response)
+    else:
+        click.echo(response)
+    # TODO be informative about likely reasons for error
+
+
+@cli.command()
+@click.argument("setting")
+@click.pass_obj
+def getvar(ctx: CommandContext, setting: str) -> None:  # noqa: A001
+    """Get the value of a script variable on the logger.
+    (E.g. anything defined as "Public" in the running script.)
+    """
+    command = commands.GetVar(ctx.topic, ctx.client_id)
+    try:
+        response = ctx.command_handler.send_command(command, setting)
+    except ConnectionError as err:
+        click.echo(f"Sorry, couldn't connect to {ctx.server}")
+        click.echo(err)
+        return
+
+    if response["success"]:
+        name = response["payload"]["name"]
+        value = response["payload"]["value"]
+        click.echo(f"Happily set {name} to {value}")
+    else:
+        if "varname" in response:
+            click.echo(f"No variable named {response['varname']} to set")
+        else:
+            click.echo(response)
 
 
 @cli.command()
