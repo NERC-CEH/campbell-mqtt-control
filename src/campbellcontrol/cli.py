@@ -203,6 +203,24 @@ def set(ctx: CommandContext, setting: str, value: Union[int, str, float]) -> Non
 
 
 @cli.command()
+@click.argument("setting")
+@click.argument("value")
+@click.pass_obj
+def setvar(ctx: CommandContext, setting: str, value: Union[int, str, float]) -> None:  # noqa: A001
+    """Update a script variable on the logger.
+    Useful for adaptive sampling!"""
+    command = commands.SetVar(ctx.topic, ctx.client_id)
+    try:
+        response = ctx.command_handler.send_command(command, setting, value)
+    except ConnectionError as err:
+        click.echo(f"Sorry, couldn't connect to {ctx.server}")
+        click.echo(err)
+        return
+
+    click.echo(response)
+
+
+@cli.command()
 @click.option("--url")
 @click.pass_obj
 def mqttconf(ctx: CommandContext, url: str) -> None:
