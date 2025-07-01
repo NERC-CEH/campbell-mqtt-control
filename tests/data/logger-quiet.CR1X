@@ -1,4 +1,4 @@
-Public PTemp, Batt_volt, CCTest
+Public PTemp, Batt_volt, CCTest, CCTest2
 
 DataTable (Test,1,-1)
     DataInterval (0,1,Min,10)
@@ -10,7 +10,7 @@ BeginProg
     Scan (1,Min,0,0)
         PanelTemp (PTemp,15000)
         Battery (Batt_volt)
-        CCTest
+        CCTest2 = CCTest
         CallTable Test
     NextScan
 EndProg
