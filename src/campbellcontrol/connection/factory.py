@@ -9,7 +9,7 @@ def get_connection(config: Config) -> Connection:
     """Reads the config and returns an appropriate Connection"""
 
     if config.broker.lower() == "aws":
-        return AWSConnection(*config.connection_args(), **config.connection_options())
+        return AWSConnection(config.client_id, *config.connection_args(), **config.connection_options())
     else:
         return PahoConnection(*config.connection_args())
         # TODO implement mTLS with Paho, if we need it

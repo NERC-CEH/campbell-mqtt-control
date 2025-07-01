@@ -23,8 +23,10 @@ class Config:
     private_key: Optional[str] = ""
 
     def connection_args(self) -> list:
-        """Return the positional arguments a Connection wants"""
-        return [self.client_id, self.server, self.port]
+        """Return the positional arguments a Connection wants
+        Note that AWSConnection wants the client_id first, Paho doesn't
+        """
+        return [self.server, self.port]
 
     def connection_options(self) -> dict:
         """Return the option arguments a Connection wants"""

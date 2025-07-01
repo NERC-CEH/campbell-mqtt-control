@@ -6,8 +6,7 @@ import click
 
 import campbellcontrol.commands.commands as commands
 from campbellcontrol.config import Config, load_config
-from campbellcontrol.connection.aws import AWSConnection
-from campbellcontrol.control import AWSCommandHandler
+from campbellcontrol.connection.factory import get_command_handler, get_connection
 
 logging.basicConfig(level=logging.WARNING)
 
@@ -21,15 +20,8 @@ class CommandContext:
         # https://github.com/NERC-CEH/campbell-mqtt-control/issues/14
         # TODO improved error handling
 
-        self.client = AWSConnection(
-            str(config.client_id),
-            config.server,
-            config.port,
-            private_key=config.private_key,
-            public_key=config.public_key,
-            certificate_root=config.certificate_root,
-        )
-        self.command_handler = AWSCommandHandler(self.client)
+        self.client = get_connection(config)
+        self.command_handler = get_command_handler(self.client)
 
         for key, value in dataclasses.asdict(config).items():
             setattr(self, key, value)
