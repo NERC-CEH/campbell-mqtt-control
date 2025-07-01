@@ -1,6 +1,7 @@
 """Module for sending commands and receiving responses from loggers."""
 
 import logging
+import threading
 import time
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
@@ -155,6 +156,10 @@ class PahoCommandHandler(CommandHandler):
 
 
 class AWSCommandHandler(CommandHandler):
+    def __init__(self, client: Connection) -> None:
+        self.receive_event = threading.Event()
+        super().__init__(client)
+
     def handle_response(self, topic: str, payload: bytes, dup: bool, qos: QoS, retain: bool, **kwargs) -> None:
         super().handle_response(topic, payload)
 
@@ -164,10 +169,11 @@ class AWSCommandHandler(CommandHandler):
             command: The command the send.
             payload: Payload to send.
         """
-        self.client.subscribe(command.response_topic, qos=QoS.EXACTLY_ONCE, callback=self.handle_response)
-        self.client.subscribe(command.state_topic, qos=QoS.EXACTLY_ONCE, callback=self.handle_response)
+        self.client.subscribe(command.response_topic, qos=QoS.AT_LEAST_ONCE, callback=self.handle_response)
+        self.client.subscribe(command.state_topic, qos=QoS.AT_LEAST_ONCE, callback=self.handle_response)
 
         self.client.publish(command.publish_topic, payload, QoS.AT_LEAST_ONCE)
+        self.receive_event.wait()
 
     def _terminate_send(self, command: Command) -> None:
         """Restores the client to the prior state, unsubscribes from topics.

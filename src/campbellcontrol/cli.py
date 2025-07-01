@@ -1,10 +1,11 @@
+import dataclasses
 import logging
 from typing import Union
 
 import click
 
 import campbellcontrol.commands.commands as commands
-from campbellcontrol.config import load_config
+from campbellcontrol.config import Config, load_config
 from campbellcontrol.connection.aws import AWSConnection
 from campbellcontrol.control import AWSCommandHandler
 
@@ -15,14 +16,22 @@ class CommandContext:
     """Create one context object that holds a CommandHandler
     and the rest of the config as attributes - click may have a better way!"""
 
-    def __init__(self, config: dict):
+    def __init__(self, config: Config):
         # TODO - factory for loading the right broker, assume AWS now
         # https://github.com/NERC-CEH/campbell-mqtt-control/issues/14
         # TODO improved error handling
-        self.client = AWSConnection("cliclient", config["server"], config["port"])
+
+        self.client = AWSConnection(
+            str(config.client_id),
+            config.server,
+            config.port,
+            private_key=config.private_key,
+            public_key=config.public_key,
+            certificate_root=config.certificate_root,
+        )
         self.command_handler = AWSCommandHandler(self.client)
 
-        for key, value in config.items():
+        for key, value in dataclasses.asdict(config).items():
             setattr(self, key, value)
 
 
@@ -33,7 +42,7 @@ class CommandContext:
 def cli(ctx: click.Context, config: str, client_id: int) -> None:
     options = load_config(config)
     if client_id:
-        options["client_id"] = client_id
+        options.client_id = client_id
     ctx.obj = CommandContext(options)
 
 
@@ -41,7 +50,7 @@ def cli(ctx: click.Context, config: str, client_id: int) -> None:
 @click.pass_obj
 def ls(ctx: CommandContext) -> None:
     """Read and print the list of files on the logger"""
-    command = commands.ListFiles(ctx.topic, ctx.client_id, options={"response_suffix": "list"})
+    command = commands.ListFiles(ctx.topic, ctx.client_id)
 
     try:
         response = ctx.command_handler.send_command(command)
@@ -110,6 +119,16 @@ def rm(ctx: CommandContext, filename: str) -> None:
 
 
 @cli.command()
+@click.option("--topic")
+@click.pass_obj
+def listen(ctx: CommandContext, topic: str) -> None:
+    ctx.client.connect()
+    print(f"{topic}/#")
+    ctx.client.subscribe(f"{topic}/#")
+
+    ctx.client.client.loop_forever()
+
+
 @click.argument("setting")
 @click.pass_obj
 def get(ctx: CommandContext, setting: str) -> None:
@@ -181,3 +200,33 @@ def set(ctx: CommandContext, setting: str, value: Union[int, str, float]) -> Non
             logging.warning(err)
 
     click.echo(message)
+
+
+@cli.command()
+@click.option("--url")
+@click.pass_obj
+def mqttconf(ctx: CommandContext, url: str) -> None:
+    command = commands.MQTTConfig(ctx.topic, ctx.client_id)
+    try:
+        response = ctx.command_handler.send_command(command, url)
+    except ConnectionError as err:
+        click.echo(f"Sorry, couldn't connect to {ctx.server}")
+        click.echo(err)
+        return
+
+    click.echo(response)
+
+
+@cli.command()
+@click.pass_obj
+def reboot(ctx: CommandContext) -> None:
+    click.confirm(f"Are you sure you want to reboot logger {ctx.client_id}?", abort=True)
+    command = commands.Reboot(ctx.topic, ctx.client_id)
+    try:
+        response = ctx.command_handler.send_command(command)
+    except ConnectionError as err:
+        click.echo(f"Sorry, couldn't connect to {ctx.server}")
+        click.echo(err)
+        return
+
+    click.echo(response)
