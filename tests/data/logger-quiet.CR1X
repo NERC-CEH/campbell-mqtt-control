@@ -10,7 +10,7 @@ BeginProg
     Scan (1,Min,0,0)
         PanelTemp (PTemp,15000)
         Battery (Batt_volt)
-        TestVar = CCTest
+        CCTest
         CallTable Test
     NextScan
 EndProg
