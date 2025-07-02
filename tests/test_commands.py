@@ -224,8 +224,8 @@ class TestMQTTCommands(unittest.TestCase):
     def test_get_variable(self):
         """Test the GetVar command"""
 
-        expected_publish_topic = f"{self.group_id}/cc/{self.device_id}/GetVar"
-        expected_response_topic = f"{self.group_id}/cr/{self.device_id}/GetVar"
+        expected_publish_topic = f"{self.group_id}/cc/{self.device_id}/getVar"
+        expected_response_topic = f"{self.group_id}/cr/{self.device_id}/getVar"
         expected_state_topic = f"{self.group_id}/state/{self.device_id}/"
 
         command = commands.GetVar(self.group_id, self.serial)
@@ -240,8 +240,8 @@ class TestMQTTCommands(unittest.TestCase):
     def test_set_variable(self):
         """Test the SetVar command"""
 
-        expected_publish_topic = f"{self.group_id}/cc/{self.device_id}/SetVar"
-        expected_response_topic = f"{self.group_id}/cr/{self.device_id}/SetVar"
+        expected_publish_topic = f"{self.group_id}/cc/{self.device_id}/setVar"
+        expected_response_topic = f"{self.group_id}/cr/{self.device_id}/setVar"
         expected_state_topic = f"{self.group_id}/state/{self.device_id}/"
 
         command = commands.SetVar(self.group_id, self.serial)
