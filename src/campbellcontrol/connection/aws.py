@@ -60,7 +60,7 @@ class AWSConnection(Connection):
         client_bootstrap = self.get_client_bootstrap()
 
         tls_context = None
-        if kwargs.get("port") == 8883:
+        if self.port == 8883:
             assert kwargs.get("private_key")
             assert kwargs.get("public_key")
 
