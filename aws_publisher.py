@@ -21,11 +21,11 @@ def main() -> None:
         public_key=config.public_key,
         certificate_root=config.certificate_root,
     )
-    print(f"{config.topic}/hello/from/mqtt-control")
+    topic = f"{config.topic}/cr/cr1000x/22505/fileControl"
     conn.connect()
     publish_future, publish_packet_id = conn.client.publish(
-        f"{config.topic}/hello/from/mqtt-control",
-        "test",
+        topic,
+        json.dumps({"action": "list"}),
         qos=QoS.AT_LEAST_ONCE,
     )
     publish_results = publish_future.result()

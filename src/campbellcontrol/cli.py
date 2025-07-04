@@ -1,6 +1,6 @@
 import dataclasses
 import logging
-from typing import Union
+from typing import Any, Union
 
 import click
 
@@ -8,7 +8,8 @@ import campbellcontrol.commands.commands as commands
 from campbellcontrol.config import Config, load_config
 from campbellcontrol.connection.factory import get_command_handler, get_connection
 
-logging.basicConfig(level=logging.WARNING)
+logger = logging.getLogger("campbellcontrol")
+logger.setLevel(logging.WARNING)
 
 
 class CommandContext:
@@ -27,7 +28,16 @@ class CommandContext:
             setattr(self, key, value)
 
 
-@click.group(context_settings={"auto_envvar_prefix": "MQTT"})  # this allows for environment variables
+class ControlGroup(click.Group):
+    def format_help(self, ctx: click.Context, formatter: click.HelpFormatter) -> Any:
+        banner = r"""
+_  _  __  ___ ___    ____ ____ __ _ ___ ____ ____ _
+|\/| [_,]  |   |  -- |___ [__] | \|  |  |--< [__] |___"""
+        formatter.write_heading(banner)
+        return super().format_help(ctx, formatter)
+
+
+@click.group(cls=ControlGroup, context_settings={"auto_envvar_prefix": "MQTT"})  # this allows for environment variables
 @click.option("--config", default="config.yaml", type=click.Path())
 @click.option("--client_id", type=int)
 @click.pass_context
@@ -56,7 +66,7 @@ def ls(ctx: CommandContext) -> None:
         return
 
     if response["success"]:
-        click.echo(f"Files on device {ctx.client_id}")
+        click.secho(f"\nFiles on device {ctx.client_id}:\n", fg="green")
         for f in response["payload"]["fileList"]:
             click.echo(f)
 
@@ -81,10 +91,12 @@ def put(ctx: CommandContext, url: str, filename: str) -> None:
         click.echo(err)
         return
 
-    if response["success"] is False:
-        click.echo(f"Couldn't upload {url} as {filename}")
+    if "error" in response:
+        click.secho(f"Couldn't upload {url} as {filename}", fg="yellow")
+        return
 
-    click.echo(response)
+    message = response["payload"]["success"]
+    click.secho(f"{message}!", fg="green")
 
 
 @cli.command()
@@ -104,10 +116,11 @@ def rm(ctx: CommandContext, filename: str) -> None:
         click.echo(err)
         return
 
-    if response["success"] is False:
-        click.echo(f"Couldn't delete {filename}")
-
-    click.echo(response)
+    if "error" in response:
+        click.secho(f"Couldn't delete {filename}", fg="yellow")
+    elif "success" in response:
+        message = response["payload"]["success"]
+        click.secho(f"{message}!", fg="green")
 
 
 @cli.command()
@@ -115,6 +128,8 @@ def rm(ctx: CommandContext, filename: str) -> None:
 @click.pass_obj
 def listen(ctx: CommandContext, topic: str) -> None:
     ctx.client.connect()
+    if not topic:
+        topic = ctx.topic
     print(f"{topic}/#")
     ctx.client.subscribe(f"{topic}/#")
 
@@ -240,21 +255,6 @@ def getvar(ctx: CommandContext, setting: str) -> None:  # noqa: A001
             click.echo(f"No variable named {response['varname']} to set")
         else:
             click.echo(response)
-
-
-@cli.command()
-@click.option("--url")
-@click.pass_obj
-def mqttconf(ctx: CommandContext, url: str) -> None:
-    command = commands.MQTTConfig(ctx.topic, ctx.client_id)
-    try:
-        response = ctx.command_handler.send_command(command, url)
-    except ConnectionError as err:
-        click.echo(f"Sorry, couldn't connect to {ctx.server}")
-        click.echo(err)
-        return
-
-    click.echo(response)
 
 
 @cli.command()

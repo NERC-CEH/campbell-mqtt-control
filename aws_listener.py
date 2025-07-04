@@ -34,14 +34,14 @@ def main(client_id: str, server: str, port: int) -> None:
     print("subscribe")
     conn.subscribe(f"{topic}/+/{client_id}", qos=mqtt.QoS.AT_LEAST_ONCE)  # ,callback=on_receive_message)
     conn.subscribe(f"{topic}/+/{client_id}/#", qos=mqtt.QoS.AT_LEAST_ONCE)
-    conn.subscribe(f"{topic}/#", qos=mqtt.QoS.AT_LEAST_ONCE, callback=on_receive_message)
+#    conn.subscribe(f"{topic}/#", qos=mqtt.QoS.AT_LEAST_ONCE, callback=on_receive_message)
 
     receive_event.wait()
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--client", default="QU8Q-9JTY-HVP8", help="Serial number of the datalogger", type=str)
+    parser.add_argument("-c", "--client", default="22505", help="Serial number of the datalogger", type=str)
     parser.add_argument(
         "-s", "--server", default="test.mosquitto.org", help="Address of the MQTT test server", type=str
     )

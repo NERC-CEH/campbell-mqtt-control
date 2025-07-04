@@ -8,3 +8,6 @@ def test_config(config_file):
 
     with pytest.raises(FileNotFoundError):
         _ = load_config("definitely_not_a_file.md")
+
+    port = config.port
+    assert type(port) == int
