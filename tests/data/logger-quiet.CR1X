@@ -7,7 +7,7 @@ DataTable (Test,1,-1)
 EndTable
 
 BeginProg
-    Scan (1,Min,0,0)
+    Scan (1,Sec,0,0)
         PanelTemp (PTemp,15000)
         Battery (Batt_volt)
         CCTest2 = CCTest

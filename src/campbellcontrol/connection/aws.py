@@ -73,7 +73,6 @@ class AWSConnection(Connection):
         del kwargs["public_key"]
         del kwargs["private_key"]
         del kwargs["certificate_root"]
-
         client = Client(client_bootstrap, tls_context)
         connection = awscrt.mqtt.Connection(
             client,
