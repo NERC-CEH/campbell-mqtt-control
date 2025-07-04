@@ -9,7 +9,7 @@ from campbellcontrol.config import Config, load_config
 from campbellcontrol.connection.factory import get_command_handler, get_connection
 
 logger = logging.getLogger("campbellcontrol")
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.WARNING)
 
 
 class CommandContext:
@@ -31,7 +31,9 @@ class ControlGroup(click.Group):
     def format_help(self, ctx: click.Context, formatter: click.HelpFormatter) -> Any:
         banner = r"""
 _  _  __  ___ ___    ____ ____ __ _ ___ ____ ____ _
-|\/| [_,]  |   |  -- |___ [__] | \|  |  |--< [__] |___"""
+|\/| [_,]  |   |  -- |___ [__] | \|  |  |--< [__] |___
+
+"""
         formatter.write_heading(banner)
         return super().format_help(ctx, formatter)
 
@@ -85,8 +87,10 @@ def put(ctx: CommandContext, url: str, filename: str) -> None:
         return
 
     # TODO question about pre-signed URLs / token authentication
+    # If we can't publish scripts to public repositories (ideal)
+    click.secho(f"Asking the logger to run the script at {url}", fg="cyan")
     try:
-        response = ctx.command_handler.send_command(command, url, filename)
+        response = ctx.command_handler.send_command(command, url, filename, timeout=30)
     except ConnectionError as err:
         click.echo(f"Sorry, couldn't connect to {ctx.server}")
         click.echo(err)
@@ -184,7 +188,7 @@ def set(ctx: CommandContext, setting: str, value: Union[int, str, float]) -> Non
     # (For example, setting the PakBusAddress to "hello")
     # And it will still return a success response
     # So we should issue a Get to check the value. It comes left padded with spaces
-
+    logging.debug(response)
     message = f"Sorry, couldn't set the {setting} to {value}"
     if response["success"]:
         new_value = get_setting(ctx, setting)
