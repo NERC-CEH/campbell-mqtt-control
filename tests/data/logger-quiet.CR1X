@@ -1,16 +1,17 @@
-Public PTemp, Batt_volt
+Public PTemp, Batt_volt, CCTest, CCTest2
 
 DataTable (Test,1,-1)
-	DataInterval (0,1,Min,10)
-	Sample (1,PTemp,FP2)
-	MQTTPublishTable(1,-1,0,Min,1)
+    DataInterval (0,1,Min,10)
+    Sample (1,PTemp,FP2)
+    MQTTPublishTable(1,-1,0,Min,1)
 EndTable
 
 BeginProg
-	Scan (1,Min,0,0)
-		PanelTemp (PTemp,15000)
-		Battery (Batt_volt)
-		CallTable Test
-	NextScan
+    Scan (1,Min,0,0)
+        PanelTemp (PTemp,15000)
+        Battery (Batt_volt)
+        CCTest2 = CCTest
+        CallTable Test
+    NextScan
 EndProg
 

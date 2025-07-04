@@ -20,5 +20,10 @@ def config_file(fixture_dir):
 
 
 @pytest.fixture
+def generic_config_file(fixture_dir):
+    return fixture_dir / "config.paho.yaml"
+
+
+@pytest.fixture
 def mqtt_config_example(fixture_dir):
     return fixture_dir / "mqttCfg.bin"

@@ -246,8 +246,8 @@ class Reboot(Command):
         response = {"success": False}
 
         if state == "offline" and "Reboot" in reason:
+            response = message
             response["success"] = True
-            response["payload"] = message
 
         return response
 
@@ -449,7 +449,7 @@ class PublishSetting(Command):
 class SetVar(Command):
     """Set variables present in the logger script."""
 
-    command_name = "SetVar"
+    command_name = "setVar"
 
     def payload(self, name: str, value: str) -> SetVarPayload:
         """Build a ayload for setting a variable.
@@ -466,7 +466,7 @@ class SetVar(Command):
 class GetVar(Command):
     """Publish variables present in the logger script."""
 
-    command_name = "GetVar"
+    command_name = "getVar"
 
     def payload(self, name: str) -> GetVarPayload:
         """Build a payload for publishing a variable.
@@ -477,6 +477,17 @@ class GetVar(Command):
             A dictionary payload.
         """
         return {"name": name}
+
+    def handler(self, topic: str, message: str) -> Optional[CommandResponse]:
+        response = {"success": False}
+        message = json.loads(message)
+        if "name" in message and "value" in message:
+            response["success"] = True
+        if "error" in message:
+            response["varname"] = message["error"].replace("Invalid field: ", "")
+        response["payload"] = message
+
+        return response
 
 
 class HistoricData(Command):

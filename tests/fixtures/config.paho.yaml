@@ -1,0 +1,5 @@
+topic: 'cs/v2'
+broker: 'mosquitto'
+client_id: 12345
+server: test.mosquitto.org 
+port: 1883

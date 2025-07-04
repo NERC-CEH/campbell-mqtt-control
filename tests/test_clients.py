@@ -1,8 +1,13 @@
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
+import pytest
 from campbellcontrol.connection.generic import PahoConnection
+from campbellcontrol.connection.aws import AWSConnection
+from campbellcontrol.connection.factory import get_connection, get_command_handler
+from campbellcontrol.control import AWSCommandHandler, CommandHandler, PahoCommandHandler
 import paho.mqtt.client
 from paho.mqtt.client import MQTTMessage
+from campbellcontrol.config import load_config, Config
 
 
 class TestPahoClient(TestCase):
@@ -70,3 +75,26 @@ class TestPahoClient(TestCase):
 
             conn.publish("sub_topic", "payload", extra_arg=1)
             conn.client.publish.assert_called_once_with("sub_topic", "payload", extra_arg=1)
+
+
+class MockConnection(MagicMock):
+    pass
+
+
+def test_connection_and_handler(config_file, generic_config_file):
+    config = load_config(config_file)
+    conn = get_connection(config)
+    assert isinstance(conn, AWSConnection)
+
+    handler = get_command_handler(conn)
+    assert isinstance(handler, AWSCommandHandler)
+
+    config = load_config(generic_config_file)
+    conn = get_connection(config)
+    assert isinstance(conn, PahoConnection)
+
+    handler = get_command_handler(conn)
+    assert isinstance(handler, PahoCommandHandler)
+
+    with pytest.raises(ValueError):
+        handler = get_command_handler(MockConnection())
