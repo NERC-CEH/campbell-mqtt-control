@@ -17,10 +17,6 @@ class CommandContext:
     and the rest of the config as attributes - click may have a better way!"""
 
     def __init__(self, config: Config):
-        # TODO - factory for loading the right broker, assume AWS now
-        # https://github.com/NERC-CEH/campbell-mqtt-control/issues/14
-        # TODO improved error handling
-
         self.client = get_connection(config)
         self.command_handler = get_command_handler(self.client)
 
@@ -65,7 +61,7 @@ def ls(ctx: CommandContext) -> None:
         click.echo(f"Sorry, couldn't reach {ctx.client_id} on {ctx.server}")
         return
 
-    if response["success"]:
+    if "success" in response and response["success"]:
         click.secho(f"\nFiles on device {ctx.client_id}:\n", fg="green")
         for f in response["payload"]["fileList"]:
             click.echo(f)
@@ -121,19 +117,6 @@ def rm(ctx: CommandContext, filename: str) -> None:
     elif "success" in response:
         message = response["payload"]["success"]
         click.secho(f"{message}!", fg="green")
-
-
-@cli.command()
-@click.option("--topic")
-@click.pass_obj
-def listen(ctx: CommandContext, topic: str) -> None:
-    ctx.client.connect()
-    if not topic:
-        topic = ctx.topic
-    print(f"{topic}/#")
-    ctx.client.subscribe(f"{topic}/#")
-
-    ctx.client.client.loop_forever()
 
 
 @click.argument("setting")
@@ -260,6 +243,7 @@ def getvar(ctx: CommandContext, setting: str) -> None:  # noqa: A001
 @cli.command()
 @click.pass_obj
 def reboot(ctx: CommandContext) -> None:
+    """Reboot the logger! Use with caution"""
     click.confirm(f"Are you sure you want to reboot logger {ctx.client_id}?", abort=True)
     command = commands.Reboot(ctx.topic, ctx.client_id)
     try:
@@ -269,4 +253,10 @@ def reboot(ctx: CommandContext) -> None:
         click.echo(err)
         return
 
-    click.echo(response)
+    if response is None:
+        click.secho(f"Sorry, couldn't reach {ctx.client_id} on {ctx.server}", fg="yellow")
+        return
+    if "success" in response and response["success"]:
+        click.secho(
+            f"Successfully ran: {response['payload']['reason']} for {response['payload']['clientId']}", fg="green"
+        )

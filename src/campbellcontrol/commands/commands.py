@@ -246,8 +246,8 @@ class Reboot(Command):
         response = {"success": False}
 
         if state == "offline" and "Reboot" in reason:
+            response = message
             response["success"] = True
-            response["payload"] = message
 
         return response
 
