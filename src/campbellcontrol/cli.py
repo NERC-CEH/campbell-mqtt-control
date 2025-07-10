@@ -130,6 +130,7 @@ def rm(ctx: CommandContext, filename: str) -> None:
         click.secho(f"{message}!", fg="green")
 
 
+@cli.command()
 @click.argument("setting")
 @click.pass_obj
 def get(ctx: CommandContext, setting: str) -> None:
@@ -137,7 +138,8 @@ def get(ctx: CommandContext, setting: str) -> None:
 
     To see a list of all settings, type "mqtt-control settings"
     """
-    return get_setting(ctx, setting)
+    setting = get_setting(ctx, setting)
+    click.secho(setting, fg="green")
 
 
 def get_setting(ctx: CommandContext, setting: str) -> None:
@@ -180,7 +182,7 @@ def set(ctx: CommandContext, setting: str, value: Union[int, str, float]) -> Non
     """Update a setting on the logger"""
     command = commands.SetSetting(ctx.topic, ctx.device)
     try:
-        response = ctx.command_handler.send_command(command, setting, value)
+        response = ctx.command_handler.send_command(command, setting, value, apply=True)
     except ConnectionError as err:
         click.echo(f"Sorry, couldn't connect to {ctx.server}")
         click.echo(err)
@@ -192,15 +194,17 @@ def set(ctx: CommandContext, setting: str, value: Union[int, str, float]) -> Non
     # So we should issue a Get to check the value. It comes left padded with spaces
     logging.debug(response)
     message = f"Sorry, couldn't set the {setting} to {value}"
+    color = "yellow"
     if response["success"]:
         new_value = get_setting(ctx, setting)
         try:
             assert str(new_value) == str(value)
             message = f"Happily set the {setting} to {value}!"
+            color = "green"
         except AssertionError as err:
             logging.warning(err)
 
-    click.echo(message)
+    click.secho(message, fg=color)
 
 
 @cli.command()
