@@ -6,9 +6,8 @@ from campbellcontrol.commands import commands
 class TestMQTTCommands(unittest.TestCase):
     def setUp(self) -> None:
         self.group_id = "loggers/cr6"
-        self.model = "cr1000x"
         self.serial = "ABC#123!"
-        self.device_id = f"{self.model}/{self.serial}"
+        self.device_id = self.serial
 
     def test_os_command(self):
         """Test the OS command."""
@@ -64,19 +63,18 @@ class TestMQTTCommands(unittest.TestCase):
 
     def test_config_device_options(self):
         # can't use pytest.mark.parametrize with unittest classes
-        for model in ["cr6", "cr1000x", "madeup"]:
-            expected_publish_topic = f"{self.group_id}/cc/{model}/{self.serial}/mqttConfig"
-            expected_response_topic = f"{self.group_id}/cr/{model}/{self.serial}/mqttConfig"
-            expected_state_topic = f"{self.group_id}/state/{model}/{self.serial}/"
+        expected_publish_topic = f"{self.group_id}/cc/{self.serial}/mqttConfig"
+        expected_response_topic = f"{self.group_id}/cr/{self.serial}/mqttConfig"
+        expected_state_topic = f"{self.group_id}/state/{self.serial}/"
 
-            command = commands.MQTTConfig(self.group_id, self.serial, model)
+        command = commands.MQTTConfig(self.group_id, self.device_id)
 
-            self.assertEqual(command.publish_topic, expected_publish_topic)
-            self.assertEqual(
-                command.response_topic,
-                expected_response_topic,
-            )
-            self.assertEqual(command.state_topic, expected_state_topic)
+        self.assertEqual(command.publish_topic, expected_publish_topic)
+        self.assertEqual(
+            command.response_topic,
+            expected_response_topic,
+        )
+        self.assertEqual(command.state_topic, expected_state_topic)
 
     def test_edit_constants_command(self):
         """Test the constants editing command."""

@@ -49,17 +49,17 @@ class Command(ABC):
         self,
         group_id: str,
         client_id: str,
-        model: Optional[str] = "cr1000x",
         options: Optional[dict] = {},
     ) -> None:
-        """Initializes the class. The topics should match that used by the target logger
+        """Initializes the class. The topics should match that used by the target logger.
+        Note - if the device is sending "cr1000x/12345" that should be the client ID
 
         Args:
             group_id: The base topic used by the logger.
             client_id: The client identifier (often the serial number) of the target logger
-            model: optional, default 'cr1000x' - the model number of the logger
+
         """
-        self.device_id = f"{model}/{client_id}"
+        self.device_id = client_id
         self.publish_topic = f"{group_id}/cc/{self.device_id}/{self.command_name}"
         self.response_topic = f"{group_id}/cr/{self.device_id}/{self.command_name}"
 
