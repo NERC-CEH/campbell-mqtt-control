@@ -173,7 +173,6 @@ class AWSCommandHandler(CommandHandler):
         self.client.subscribe(command.state_topic, qos=QoS.AT_LEAST_ONCE, callback=self.handle_response)
 
         self.client.publish(command.publish_topic, payload, QoS.AT_LEAST_ONCE)
-        self.receive_event.wait()
 
     def _terminate_send(self, command: Command) -> None:
         """Restores the client to the prior state, unsubscribes from topics.

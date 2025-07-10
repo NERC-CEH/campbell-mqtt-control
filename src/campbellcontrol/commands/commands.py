@@ -393,9 +393,8 @@ class SetSetting(Command):
         """
         response = {"success": False}
         message = json.loads(message)
-        if "state" in message and message["state"] == "Set Setting Succeeded":
-            response["success"] = True
-            response["payload"] = message
+        if "success" in message:
+            response = message
         return response
 
 
