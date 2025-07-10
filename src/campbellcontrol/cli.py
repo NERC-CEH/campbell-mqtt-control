@@ -16,7 +16,7 @@ class CommandContext:
     """Create one context object that holds a CommandHandler
     and the rest of the config as attributes - click may have a better way!"""
 
-    def __init__(self, config: Config, device: str=None):
+    def __init__(self, config: Config, device: str = None):
         self.client = get_connection(config)
         self.command_handler = get_command_handler(self.client)
 
@@ -27,6 +27,8 @@ class CommandContext:
         elif self.client_id:
             self.device = self.client_id
         logger.info(self.device)
+
+
 class ControlGroup(click.Group):
     def format_help(self, ctx: click.Context, formatter: click.HelpFormatter) -> Any:
         banner = r"""
