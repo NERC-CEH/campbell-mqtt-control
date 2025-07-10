@@ -1,6 +1,6 @@
 topic: 'cs/v2'
 broker: 'AWS'
-serial: 12345
+client_id: 12345
 server: localhost
 port: 1883
 certificate_root: 'CARoot.pem'
