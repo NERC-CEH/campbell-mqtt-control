@@ -4,10 +4,7 @@ Command-line interface
 We provide a command-line interface to the library. You can use this from your PC to update the settings on a remote Campbell device. We plan to provide a way to do this inside Amazon Web Services without having to install the tool or create certificates.
 
 .. code:: bash
-    _  _  __  ___ ___    ____ ____ __ _ ___ ____ ____ _
-    |\/| [_,]  |   |  -- |___ [__] | \|  |  |--< [__] |___
 
-    :
     Usage: mqtt-control [OPTIONS] COMMAND [ARGS]...
 
     Options:
@@ -38,7 +35,7 @@ Authentication
 
 Create certificates for testing using the AWS console or the ``aws`` commandline interface.
 
-- ``Create AWS IoT client certificates <https://docs.aws.amazon.com/iot/latest/developerguide/device-certs-create.html>``_
+- `Create AWS IoT client certificates <https://docs.aws.amazon.com/iot/latest/developerguide/device-certs-create.html>`
 
 Configuration
 -------------
