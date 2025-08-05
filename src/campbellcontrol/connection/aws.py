@@ -112,7 +112,7 @@ class AWSConnection(Connection):
             tls_options = io.TlsContextOptions.create_client_with_mtls_from_path(cert, key)
         except FileNotFoundError as err:
             logging.error(err)
-            exit(1) 
+            exit(1)
 
         if root_ca:
             try:
@@ -124,7 +124,6 @@ class AWSConnection(Connection):
 
         tls_context = io.ClientTlsContext(tls_options)
         return tls_context
-
 
     def connect(self) -> None:
         """Connect to the MQTT broker."""
