@@ -108,7 +108,12 @@ class AWSConnection(Connection):
 
         # TODO Add websockets support, if we (or others) need it
         """
-        tls_options = io.TlsContextOptions.create_client_with_mtls_from_path(cert, key)
+        try:
+            tls_options = io.TlsContextOptions.create_client_with_mtls_from_path(cert, key)
+        except FileNotFoundError as err:
+            logging.error(err)
+            exit(1) 
+
         if root_ca:
             try:
                 tls_options.override_default_trust_store_from_path(ca_filepath=root_ca)
@@ -119,6 +124,7 @@ class AWSConnection(Connection):
 
         tls_context = io.ClientTlsContext(tls_options)
         return tls_context
+
 
     def connect(self) -> None:
         """Connect to the MQTT broker."""
