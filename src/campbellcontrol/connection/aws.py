@@ -131,7 +131,7 @@ class AWSConnection(Connection):
         try:
             future.result()
         except (AwsCrtError, TypeError) as err:
-           # raise ConnectionError(err)
+            # raise ConnectionError(err)
             logging.error(err)
             exit(1)
 

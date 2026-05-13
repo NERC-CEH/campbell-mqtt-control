@@ -32,9 +32,10 @@ def main(client_id: str, server: str, port: int) -> None:
 
     conn.connect()
     print("subscribe")
-    conn.subscribe(f"{topic}/+/{client_id}", qos=mqtt.QoS.AT_LEAST_ONCE)  # ,callback=on_receive_message)
-    conn.subscribe(f"{topic}/+/{client_id}/#", qos=mqtt.QoS.AT_LEAST_ONCE)
-    conn.subscribe(f"{topic}/#", qos=mqtt.QoS.AT_LEAST_ONCE, callback=on_receive_message)
+    device_id = config.device_id
+    conn.subscribe(f"{topic}/+/{device_id}", qos=mqtt.QoS.AT_LEAST_ONCE)  # ,callback=on_receive_message)
+    conn.subscribe(f"{topic}/+/{device_id}/#", qos=mqtt.QoS.AT_LEAST_ONCE)
+#    conn.subscribe(f"{topic}/#", qos=mqtt.QoS.AT_LEAST_ONCE, callback=on_receive_message)
 
     receive_event.wait()
 

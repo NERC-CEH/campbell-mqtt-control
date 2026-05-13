@@ -256,6 +256,24 @@ def getvar(ctx: CommandContext, setting: str) -> None:  # noqa: A001
 
 
 @cli.command()
+@click.argument("table")
+@click.argument("start")
+@click.argument("end")
+@click.pass_obj
+def historicData(ctx: CommandContext, table: str, start: str, end: str) -> None:
+    """Ask the logger to resend historic data"""
+    click.confirm(f"Are you sure you want to resend data from {start}?", abort=True)
+    command = commands.HistoricData(ctx.topic, ctx.device)
+    try:
+        _ = ctx.command_handler.send_command(command, table, start, end)
+    except ConnectionError as err:
+        click.echo(f"Sorry, couldn't connect to {ctx.server}")
+        click.echo(err)
+        return
+    # Not sure if we get a payload response, or just watch for the data
+
+
+@cli.command()
 @click.pass_obj
 def reboot(ctx: CommandContext) -> None:
     """Reboot the logger! Use with caution"""
