@@ -23,6 +23,13 @@ filterwarnings = [
     "ignore::DeprecationWarning:pkg_resources.*:",
 ]
 
+
+
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+
 [tool.coverage.run]
 omit = ["*__init__.py"]
 
