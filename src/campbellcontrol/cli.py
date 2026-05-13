@@ -1,5 +1,6 @@
 import dataclasses
 import logging
+from datetime import datetime
 from typing import Any, Union
 
 import click
@@ -262,7 +263,15 @@ def getvar(ctx: CommandContext, setting: str) -> None:  # noqa: A001
 @click.pass_obj
 def historicData(ctx: CommandContext, table: str, start: str, end: str) -> None:
     """Ask the logger to resend historic data"""
-    click.confirm(f"Are you sure you want to resend data from {start}?", abort=True)
+    click.confirm(f"Are you sure you want to resend data from {start} to {end}?", abort=True)
+
+    try:
+        datetime.fromisoformat(start)
+        datetime.fromisoformat(end)
+    except ValueError:
+        click.echo("Start and end dates have to be in ISO 8601 format e.g. 2026-05-12T06:35:00.335Z")
+        return
+
     command = commands.HistoricData(ctx.topic, ctx.device)
     try:
         _ = ctx.command_handler.send_command(command, table, start, end)
