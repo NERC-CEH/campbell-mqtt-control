@@ -65,7 +65,7 @@ wheels = [
 
 [[package]]
 name = "campbell-control"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "autosemver" },
     { name = "awscrt" },
