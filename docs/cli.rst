@@ -65,11 +65,11 @@ Some options in the configuration file can be over-written by command-line switc
 
 For example:
 
-``mqtt-control --client_id 54321 ls``
+``mqtt-control --device_id ABCD-1234-FGHJ --client_id 54321 ls``
 
 Will replace the client ID number set in the configuration file.
 
-Note that these are options to ``mqtt-control`` and not to its sub-commands!
+Note that these are options to ``mqtt-control --device_id ABCD-1234-FGHJ`` and not to its sub-commands!
 
 Settings
 --------
@@ -80,23 +80,23 @@ There's a [full list of settings in the official documentation](https://help.cam
 
 Get the value of a specific setting on the logger. 
 
-``mqtt-control get [setting]``
+``mqtt-control --device_id ABCD-1234-FGHJ --device_id ABCD-1234-FGHJ get [setting]``
 
 For example,
 
-``mqtt-control get PakBusAddress``
+``mqtt-control --device_id ABCD-1234-FGHJ --device_id ABCD-1234-FGHJ get PakBusAddress``
 
 Set a given setting to a specific value:
 
-``mqtt-control set [setting] [value]``
+``mqtt-control --device_id ABCD-1234-FGHJ --device_id ABCD-1234-FGHJ set [setting] [value]``
 
 For example,
 
-``mqtt-control set PakBusAddress 2``
+``mqtt-control --device_id ABCD-1234-FGHJ --device_id ABCD-1234-FGHJ set PakBusAddress 2``
 
 See a list of all the setting names available to get or set:
 
-``mqtt-control settings``
+``mqtt-control --device_id ABCD-1234-FGHJ settings``
 
 
 MQTT Configuration (not yet implemented)
@@ -104,20 +104,20 @@ MQTT Configuration (not yet implemented)
 
 Send an updated MQTT configuration value to the logger.
 
-``mqtt-control config --name [setting] --value [value]``
+``mqtt-control --device_id ABCD-1234-FGHJ config --name [setting] --value [value]``
 
 
 Scripts
 -------
 
-``mqtt-control ls`` - show a file listing
+``mqtt-control --device_id ABCD-1234-FGHJ ls`` - show a file listing
 
-``mqtt-control rm --filename [file]`` - delete a file
+``mqtt-control --device_id ABCD-1234-FGHJ rm --filename [file]`` - delete a file
 
-``mqtt-control put --url=[url] --filename=[filename]`` - download the file from ``url`` and save it at the location ``filename``. *"If successful, the program will be set to run now and run on power up and the data logger will restart and compile and run the program"*
+``mqtt-control --device_id ABCD-1234-FGHJ put --url=[url] --filename=[filename]`` - download the file from ``url`` and save it at the location ``filename``. *"If successful, the program will be set to run now and run on power up and the data logger will restart and compile and run the program"*
 
 Script control
 ------------------------------------
 
-``mqtt-control getVar`` - get the value of a script variable
-``mqtt-control setVar`` - set the value of a script variable
+``mqtt-control --device_id ABCD-1234-FGHJ getVar`` - get the value of a script variable
+``mqtt-control --device_id ABCD-1234-FGHJ setVar`` - set the value of a script variable
