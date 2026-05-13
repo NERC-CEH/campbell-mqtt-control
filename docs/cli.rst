@@ -8,21 +8,22 @@ We provide a command-line interface to the library. You can use this from your P
     Usage: mqtt-control [OPTIONS] COMMAND [ARGS]...
 
     Options:
-    --config PATH
-    --client_id TEXT
-    --device_id TEXT
-    --help            Show this message and exit.
+      --config PATH
+      --client_id TEXT
+      --device_id TEXT
+      --help            Show this message and exit.
 
     Commands:
-    get       Get the value of a setting on the logger.
-    getvar    Get the value of a script variable on the logger.
-    ls        Read and print the list of files on the logger
-    put       Upload a file at {URL} to a file named {filename} on the logger
-    reboot    Reboot the logger! Use with caution
-    rm        Delete a named file off the datalogger
-    set       Update a setting on the logger
-    settings  Shows all the settings which you can reset with this tool.
-    setvar    Update a script variable on the logger.
+      get           Get the value of a setting on the logger.
+      getvar        Get the value of a script variable on the logger.
+      historicdata  Ask the logger to resend historic data
+      ls            Read and print the list of files on the logger
+      put           Upload a file at {URL} to a file named {filename} on the...
+      reboot        Reboot the logger! Use with caution
+      rm            Delete a named file off the datalogger
+      set           Update a setting on the logger
+      settings      Shows all the settings which you can reset with this tool.
+      setvar        Update a script variable on the logger.
 
 
 Quickstart
@@ -119,7 +120,21 @@ Scripts
 ``mqtt-control --device_id ABCD-1234-FGHJ put --url=[url] --filename=[filename]`` - download the file from ``url`` and save it at the location ``filename``. *"If successful, the program will be set to run now and run on power up and the data logger will restart and compile and run the program"*
 
 Script control
-------------------------------------
+--------------
 
 ``mqtt-control --device_id ABCD-1234-FGHJ getVar`` - get the value of a script variable
 ``mqtt-control --device_id ABCD-1234-FGHJ setVar`` - set the value of a script variable
+
+
+Historic data
+-------------
+
+Specify a table and a time range. There's no standard way to get a table listing via MQTT.
+
+The start and end range should be in ISO 8601 format (there's a check for this, and a prompt to confirm the date range as well)
+
+``mqtt-control --device_id ABCD-1234-FGHJ historicdata TABLE_NAME 2026-05-12T06:35:00.335Z 2026-05-12T06:40:00.335Z``
+
+The logger will respond with chunks of data on this topic, most recent first:
+
+``/BASE_TOPIC/cr/ABCD-1234-FGHJ/historicData/TABLE_NAME/cj/``
