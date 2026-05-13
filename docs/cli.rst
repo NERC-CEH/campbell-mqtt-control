@@ -65,11 +65,13 @@ Some options in the configuration file can be over-written by command-line switc
 
 For example:
 
-``mqtt-control --device_id ABCD-1234-FGHJ --client_id 54321 ls``
+``mqtt-control --client_id 54321 ls``
 
 Will replace the client ID number set in the configuration file.
 
-Note that these are options to ``mqtt-control --device_id ABCD-1234-FGHJ`` and not to its sub-commands!
+Note that these are options to ``mqtt-control`` and not to its sub-commands!
+
+You can optionally set ``device_id`` in the configuration but it won't be picked up by default (seemed likely to cause confusion. Could be changed)
 
 Settings
 --------
@@ -80,19 +82,19 @@ There's a [full list of settings in the official documentation](https://help.cam
 
 Get the value of a specific setting on the logger. 
 
-``mqtt-control --device_id ABCD-1234-FGHJ --device_id ABCD-1234-FGHJ get [setting]``
+``mqtt-control --device_id ABCD-1234-FGHJ get [setting]``
 
 For example,
 
-``mqtt-control --device_id ABCD-1234-FGHJ --device_id ABCD-1234-FGHJ get PakBusAddress``
+``mqtt-control --device_id ABCD-1234-FGHJ get PakBusAddress``
 
 Set a given setting to a specific value:
 
-``mqtt-control --device_id ABCD-1234-FGHJ --device_id ABCD-1234-FGHJ set [setting] [value]``
+``mqtt-control --device_id ABCD-1234-FGHJ set [setting] [value]``
 
 For example,
 
-``mqtt-control --device_id ABCD-1234-FGHJ --device_id ABCD-1234-FGHJ set PakBusAddress 2``
+``mqtt-control --device_id ABCD-1234-FGHJ set PakBusAddress 2``
 
 See a list of all the setting names available to get or set:
 
