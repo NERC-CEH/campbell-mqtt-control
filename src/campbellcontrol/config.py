@@ -18,6 +18,7 @@ class Config:
     broker: str
     server: str
     port: int
+    device_id: Optional[str] = ""
     certificate_root: Optional[str] = ""
     public_key: Optional[str] = ""
     private_key: Optional[str] = ""
