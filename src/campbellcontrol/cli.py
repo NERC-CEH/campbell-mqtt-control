@@ -140,7 +140,11 @@ def get(ctx: CommandContext, setting: str) -> None:
     To see a list of all settings, type "mqtt-control settings"
     """
     setting = get_setting(ctx, setting)
-    click.secho(setting, fg="green")
+    color = "yellow"
+    # Kludge, only show success statuses in green
+    if "Sorry" not in setting:
+        color = "green"
+    click.secho(setting, fg=color)
 
 
 def get_setting(ctx: CommandContext, setting: str) -> None:
@@ -152,6 +156,11 @@ def get_setting(ctx: CommandContext, setting: str) -> None:
         click.echo(f"Sorry, couldn't connect to {ctx.server}")
         click.echo(err)
         return
+
+    if not response:
+        return f"Sorry, couldn't connect to {ctx.device}"
+    if not response.get("success"):
+        return f"Sorry, couldn't read a value for {setting}"
     setting = response["payload"].get("value", None)
     if setting:
         # It comes back padded. We may wish to infer a type or use a mapping
