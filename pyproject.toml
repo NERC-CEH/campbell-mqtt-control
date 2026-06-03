@@ -1,8 +1,8 @@
 [project]
 requires-python = ">=3.12"
-dependencies = ["autosemver", "awscrt", "paho-mqtt", "setuptools", "click", "pyyaml"]
+dependencies = ["awscrt", "paho-mqtt", "setuptools", "click", "pyyaml"]
 name = "campbell-control"
-version = "0.2.0"
+version = "0.2.1"
 description = "A python package for controlling Campbell dataloggers over MQTT"
 
 [project.scripts]
@@ -17,12 +17,6 @@ dev = ["campbell-control[test,docs,lint]"]
 [tool.pytest.ini_options]
 addopts = "-m 'not hardware' --cov=campbellcontrol --cov=mqttconfig --cov-report=term-missing"
 markers = ["hardware: Tests that require a logger connected"]
-
-filterwarnings = [
-    "ignore::DeprecationWarning:autosemver.*:",
-    "ignore::DeprecationWarning:pkg_resources.*:",
-]
-
 
 
 [build-system]
