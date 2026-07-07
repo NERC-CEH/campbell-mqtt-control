@@ -10,7 +10,7 @@ BeginProg
 	Scan (1,Sec,0,0)
 		PanelTemp (PTemp,15000)
 		Battery (Batt_volt)
-		CallTable Test
+		CallTable Test_Migration
 	NextScan
 EndProg
 
