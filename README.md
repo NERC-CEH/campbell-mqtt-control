@@ -235,13 +235,3 @@ Options
 --server Address of the MQTT broker to use for testing
 ```
 
-### Automatic Versioning
-
-This codebase is set up using [autosemver](https://autosemver.readthedocs.io/en/latest/usage.html#) a tool that uses git commit history to calculate the package version. Each time you make a commit, it increments the patch version by 1. You can increment by:
-
-* Normal commit. Use for bugfixes and small updates
-    * Increments patch version: `x.x.5 -> x.x.6`
-* Commit starts with `* NEW:`. Use for new features
-    * Increments minor version `x.1.x -> x.2.x`
-* Commit starts with `* INCOMPATIBLE:`. Use for API breaking changes
-    * Increments major version `2.x.x -> 3.x.x`

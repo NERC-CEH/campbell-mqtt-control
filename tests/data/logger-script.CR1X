@@ -1,6 +1,6 @@
 Public PTemp, Batt_volt
 
-DataTable (Test,1,-1)
+DataTable (Test_Migration,1,-1)
 	DataInterval (0,1,Sec,10)
 	Sample (1,PTemp,FP2)
 	MQTTPublishTable(1,-1,0,Sec,1)
