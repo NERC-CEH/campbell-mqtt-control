@@ -42,7 +42,7 @@ if __name__ == '__main__':
         if setting:
             # The value comes back padded with whitespace
             setting = setting.strip()
-            found.append([row['Station Name'], row['ID'], setting])
+            found.append([row['Station Name'], row['UI ID'], setting])
 
     # Export the results as CSV
     with open('out.csv', 'w', newline='') as f:

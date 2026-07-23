@@ -17,7 +17,7 @@ from awscrt.mqtt import (
 
 from campbellcontrol.connection.interface import Connection
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 logger = logging.getLogger(__name__)
 
