@@ -130,17 +130,23 @@ class Program(Command):
     """Command to download a CRBasic Program.
     The downloaded file is set to the current program and reboots the logger.
 
-    If the download fails, the response is sent on `state`, we see two messages:
-
-        {"clientId":"ABC",
-         "state":"online",
-         "fileTransfer":"CRBasic file transfer started"}
-
-        {"clientId":"ABC",
-         "state":"online",
-         "fileTransfer":"CRBasic file transfer error"}
-
+    If the download fails, the response is sent on `state`, we see two messages.
+    This may vary according to Campbell firmware version.
     """
+    #{"clientId": "ABC",
+    #  "state": "offline",
+    #  "reason": "Loading program"}
+    #{ "clientId": "ABC",
+    #  "state": "online",
+    #  "fileTransfer": "Program file download"}
+
+    #{"clientId":"ABC",
+    # "state":"online",
+    # "fileTransfer":"CRBasic file transfer started"}
+
+    #{"clientId":"ABC",
+    # "state":"online",
+    # "fileTransfer":"CRBasic file transfer error"}
 
     command_name = "program"
 
@@ -167,7 +173,7 @@ class Program(Command):
         if status == "CRBasic file transfer error":
             message["error"] = "Program download failed"
             message["success"] = False
-        elif status == "Loading CRBasic file":
+        elif status == "Loading CRBasic file" or status == "Loading program":
             message["success"] = "Program loaded successfully"
 
         if "success" in message:
