@@ -99,7 +99,7 @@ def put(ctx: CommandContext, url: str, filename: str) -> None:
         click.echo(err)
         return
 
-    message = ''
+    message = ""
     if response:
         if "error" in response:
             click.secho(f"Couldn't upload {url} as {filename}", fg="yellow")
@@ -110,7 +110,9 @@ def put(ctx: CommandContext, url: str, filename: str) -> None:
     # TODO find out why some devices send a success response, others don't
     print(response)
     if not message:
-        message = "The device didn't send a response, but we think this worked. Please double-check with 'mqtt-control ls'"  # noqa: E501
+        message = (
+            "The device didn't send a response, but we think this worked. Please double-check with 'mqtt-control ls'"  # noqa: E501
+        )
     click.secho(f"{message}!", fg="green")
 
 
